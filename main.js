@@ -1,6 +1,6 @@
 'use strict';
 const {
-  app, BrowserWindow, ipcMain, session, Notification, dialog, Tray, Menu, nativeImage, shell, systemPreferences, clipboard
+  app, BrowserWindow, ipcMain, session, Notification, dialog, Tray, Menu, nativeImage, shell, systemPreferences, clipboard, globalShortcut
 } = require('electron');
 const path = require('path');
 const fs = require('fs');
@@ -282,9 +282,97 @@ ipcMain.on('dw:msg', async (e, raw) => {
 const iconPath = (name) => path.join(__dirname, 'assets', 'icons', (name || 'Default') + '.png');
 const appIcon = () => nativeImage.createFromPath(iconPath(bridge ? bridge.state().icon : 'Default'));
 
+function protectWindow(bw) {
+  if (!bw || bw.isDestroyed()) return;
+  try { bw.setContentProtection(true); } catch (e) { /* تجاهل */ }
+}
+
+function triggerShotShield(bw) {
+  try { clipboard.writeText(''); } catch (e) { /* تجاهل */ }
+  const target = bw && !bw.isDestroyed() ? bw : win;
+  if (target && !target.isDestroyed()) {
+    try { target.webContents.send('dw:shield', true); } catch (e) { /* تجاهل */ }
+    setTimeout(() => {
+      if (target && !target.isDestroyed() && target.isFocused()) {
+        try { target.webContents.send('dw:shield', false); } catch (e) { /* تجاهل */ }
+      }
+    }, 2500);
+  }
+}
+
+const SHOT_SHORTCUTS = [
+  'PrintScreen',
+  'Alt+PrintScreen',
+  'CommandOrControl+Shift+3',
+  'CommandOrControl+Shift+4',
+  'CommandOrControl+Shift+5',
+  'CommandOrControl+Shift+6'
+];
+
+function registerShotShortcuts() {
+  for (const acc of SHOT_SHORTCUTS) {
+    try {
+      if (!globalShortcut.isRegistered(acc)) {
+        globalShortcut.register(acc, () => triggerShotShield(win));
+      }
+    } catch (e) { /* تجاهل */ }
+  }
+}
+
+function unregisterShotShortcuts() {
+  for (const acc of SHOT_SHORTCUTS) {
+    try {
+      if (globalShortcut.isRegistered(acc)) globalShortcut.unregister(acc);
+    } catch (e) { /* تجاهل */ }
+  }
+}
+
+function attachInputProtection(bw) {
+  if (!bw || bw.isDestroyed()) return;
+  bw.webContents.on('before-input-event', (ev, input) => {
+    const key = String(input.key || '').toLowerCase();
+    const isScreenshot =
+      key === 'printscreen' ||
+      input.code === 'PrintScreen' ||
+      ((input.meta || input.control) && input.shift && ['3', '4', '5', '6', 's'].includes(key));
+    const isRestricted =
+      key === 'f12' ||
+      ((input.control || input.meta) && input.shift && ['i', 'j', 'c', 'k'].includes(key)) ||
+      ((input.control || input.meta) && ['u', 'p', 's'].includes(key));
+    if (isScreenshot || isRestricted) {
+      ev.preventDefault();
+      if (isScreenshot) triggerShotShield(bw);
+    }
+  });
+}
+
+app.on('browser-window-created', (_ev, bw) => {
+  protectWindow(bw);
+  attachInputProtection(bw);
+  bw.once('ready-to-show', () => protectWindow(bw));
+  bw.on('show', () => protectWindow(bw));
+  bw.on('restore', () => protectWindow(bw));
+  bw.on('focus', () => {
+    protectWindow(bw);
+    registerShotShortcuts();
+  });
+  bw.on('blur', () => {
+    setTimeout(() => {
+      const focused = BrowserWindow.getFocusedWindow();
+      if (!focused) unregisterShotShortcuts();
+    }, 50);
+  });
+  bw.on('enter-full-screen', () => protectWindow(bw));
+  bw.on('leave-full-screen', () => protectWindow(bw));
+  bw.on('maximize', () => protectWindow(bw));
+  bw.on('unmaximize', () => protectWindow(bw));
+  bw.webContents.on('did-finish-load', () => protectWindow(bw));
+  bw.webContents.on('did-frame-finish-load', () => protectWindow(bw));
+});
+
 function applyProtection() {
-  if (!win || win.isDestroyed()) return;
-  try { win.setContentProtection(true); } catch (e) { /* تجاهل */ }
+  protectWindow(win);
+  for (const bw of BrowserWindow.getAllWindows()) protectWindow(bw);
 }
 
 function showWin() {
@@ -315,6 +403,9 @@ function createWindow() {
   win.on('blur', () => {
     if (!win.isDestroyed()) win.webContents.send('dw:shield', true);
   });
+  win.on('hide', () => {
+    unregisterShotShortcuts();
+  });
   setTimeout(() => {
     if (win && !win.isDestroyed() && !win.isVisible()) {
       applyProtection();
@@ -334,28 +425,6 @@ function createWindow() {
     setTimeout(() => {
       if (win && !win.isDestroyed()) win.loadURL(origin + '/');
     }, 500);
-  });
-
-  win.webContents.on('before-input-event', (ev, input) => {
-    const key = String(input.key || '').toLowerCase();
-    const isScreenshot =
-      key === 'printscreen' ||
-      input.code === 'PrintScreen' ||
-      ((input.meta || input.control) && input.shift && ['3', '4', '5', '6', 's'].includes(key));
-    const isRestricted =
-      key === 'f12' ||
-      ((input.control || input.meta) && input.shift && ['i', 'j', 'c', 'k'].includes(key)) ||
-      ((input.control || input.meta) && ['u', 'p', 's'].includes(key));
-    if (isScreenshot || isRestricted) {
-      ev.preventDefault();
-      if (isScreenshot && !win.isDestroyed()) {
-        try { clipboard.writeText(''); } catch (e) { /* تجاهل */ }
-        win.webContents.send('dw:shield', true);
-        setTimeout(() => {
-          if (win && !win.isDestroyed() && win.isFocused()) win.webContents.send('dw:shield', false);
-        }, 2500);
-      }
-    }
   });
 
   win.webContents.setWindowOpenHandler(({ url }) => {
@@ -412,7 +481,8 @@ function checkUpdates(manual) {
 
 // ------------------------------------------------------------------ التشغيل
 app.on('second-instance', showWin);
-app.on('before-quit', () => { quitting = true; });
+app.on('before-quit', () => { quitting = true; unregisterShotShortcuts(); });
+app.on('will-quit', () => { unregisterShotShortcuts(); });
 app.on('activate', showWin);
 app.on('window-all-closed', () => { /* نبقى في الخلفية (Tray) للتذكيرات */ });
 
