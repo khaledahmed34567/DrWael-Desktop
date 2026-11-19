@@ -1,0 +1,115 @@
+name: Build Desktop App
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ windows-latest, macos-latest, ubuntu-latest ]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 40
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: Find the project folder
+        run: |
+          S=$(find . -maxdepth 3 -name package.json -not -path '*/node_modules/*' -not -path './_project/*' | head -1)
+          if [ -z "$S" ]; then
+            Z=$(find . -maxdepth 2 -iname '*.zip' -not -path './.git/*' | head -1)
+            if [ -n "$Z" ]; then
+              echo "Project files not found, extracting $Z"
+              mkdir -p _project
+              python -c "import zipfile,sys;zipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])" "$Z" _project
+              S=$(find _project -maxdepth 3 -name package.json | head -1)
+            fi
+          fi
+          if [ -z "$S" ]; then
+            echo "::error::No project found. Upload DrWael-Desktop-Project.zip to the repository root (or the extracted files)."
+            ls -la
+            exit 1
+          fi
+          D=$(dirname "$S")
+          echo "PROJECT_DIR=$D" >> "$GITHUB_ENV"
+          echo "Project folder: $D"
+          test -f "$D/app/index.html" || { echo "::error::app/index.html is missing"; exit 1; }
+
+      - name: Optional private config from secrets
+        env:
+          APP_CONFIG_JSON: ${{ secrets.APP_CONFIG_JSON }}
+        run: |
+          if [ -n "$APP_CONFIG_JSON" ]; then
+            echo "$APP_CONFIG_JSON" > "$PROJECT_DIR/config.json"
+            echo "Using config.json from repository secrets"
+          fi
+
+      - name: Set version
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: npm version "1.0.${{ github.run_number }}" --no-git-tag-version --allow-same-version
+
+      - name: Install dependencies
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: npm install --no-audit --no-fund
+
+      - name: Build installers
+        working-directory: ${{ env.PROJECT_DIR }}
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        run: npx electron-builder --publish never
+
+      - name: Collect files
+        run: |
+          mkdir -p out
+          cd "$PROJECT_DIR/dist"
+          for f in *.exe *.dmg *.zip *.AppImage *.deb *.blockmap latest*.yml; do
+            [ -f "$f" ] && cp "$f" "$GITHUB_WORKSPACE/out/" || true
+          done
+          ls -la "$GITHUB_WORKSPACE/out"
+
+      - name: Upload build files
+        uses: actions/upload-artifact@v5
+        with:
+          name: dist-${{ matrix.os }}
+          path: out/*
+          if-no-files-found: error
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (for release notes)
+        uses: actions/checkout@v5
+
+      - name: Download all build files
+        uses: actions/download-artifact@v5
+        with:
+          pattern: dist-*
+          merge-multiple: true
+          path: release_files
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          V: 1.0.${{ github.run_number }}
+        run: |
+          ls -la release_files
+          git log -1 --pretty=%B > notes.txt || echo "Dr. Wael $V" > notes.txt
+          gh release create "v$V" release_files/* --title "Dr. Wael $V" --notes-file notes.txt --latest
