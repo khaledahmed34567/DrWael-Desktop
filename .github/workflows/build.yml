@@ -80,6 +80,9 @@ jobs:
             if (!p.dependencies["electron-updater"]) p.dependencies["electron-updater"] = "^6.3.9";
             if (!p.devDependencies.electron) p.devDependencies.electron = "^33.2.1";
             if (!p.devDependencies["electron-builder"]) p.devDependencies["electron-builder"] = "^25.1.8";
+            if (!p.homepage) p.homepage = "https://github.com/khaledahmed34567/DrWael-Desktop";
+            if (typeof p.author === "string" && !p.author.includes("@")) p.author = p.author + " <info@drwael.app>";
+            if (p.build && p.build.linux && !p.build.linux.maintainer) p.build.linux.maintainer = "Dr. Wael <info@drwael.app>";
             fs.writeFileSync("package.json", JSON.stringify(p, null, 2) + "\n");
           '
           npm install --no-audit --no-fund

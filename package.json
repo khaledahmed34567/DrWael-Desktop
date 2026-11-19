@@ -4,7 +4,8 @@
   "version": "1.0.0",
   "description": "Dr. Wael desktop app",
   "main": "main.js",
-  "author": "Dr. Wael",
+  "author": "Dr. Wael <info@drwael.app>",
+  "homepage": "https://github.com/khaledahmed34567/DrWael-Desktop",
   "license": "UNLICENSED",
   "private": true,
   "scripts": {
@@ -59,6 +60,7 @@
       "target": ["AppImage", "deb"],
       "icon": "build/icon.png",
       "category": "Education",
+      "maintainer": "Dr. Wael <info@drwael.app>",
       "artifactName": "DrWael-linux.${ext}"
     },
     "publish": [{
