@@ -31,6 +31,16 @@ app.get(['/', '/index.html'], (_req, res) => {
   });
 });
 
+app.get('/course-alerts.js', (_req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
+  res.sendFile(path.join(__dirname, 'app', 'course-alerts.js'));
+});
+
+app.get('/course-features.js', (_req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
+  res.sendFile(path.join(__dirname, 'app', 'course-features.js'));
+});
+
 app.get('/favicon.ico', (_req, res) => {
   const icon = path.join(__dirname, 'build', 'icon.png');
   if (fs.existsSync(icon)) {

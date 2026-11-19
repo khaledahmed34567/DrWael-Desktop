@@ -166,6 +166,14 @@ function startServer() {
           res.writeHead(200, { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' });
           return res.end(pageHtml());
         }
+        if (req.method === 'GET' && u.pathname === '/course-alerts.js') {
+          res.writeHead(200, { 'content-type': 'application/javascript; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' });
+          return res.end(fs.readFileSync(path.join(__dirname, 'app', 'course-alerts.js'), 'utf8'));
+        }
+        if (req.method === 'GET' && u.pathname === '/course-features.js') {
+          res.writeHead(200, { 'content-type': 'application/javascript; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' });
+          return res.end(fs.readFileSync(path.join(__dirname, 'app', 'course-features.js'), 'utf8'));
+        }
         if (req.method === 'GET' && u.pathname === '/__lib') {
           let t;
           try { t = new URL(u.searchParams.get('u') || ''); } catch (e) { res.writeHead(400); return res.end(); }
