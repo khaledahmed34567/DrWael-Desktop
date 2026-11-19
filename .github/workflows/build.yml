@@ -31,7 +31,11 @@ jobs:
 
       - name: Find the project folder
         run: |
-          S=$(find . -maxdepth 3 -name package.json -not -path '*/node_modules/*' -not -path './_project/*' | head -1)
+          if [ -f package.json ]; then
+            S=./package.json
+          else
+            S=$(find . -maxdepth 3 -name package.json -not -path '*/node_modules/*' -not -path './_project/*' | head -1)
+          fi
           if [ -z "$S" ]; then
             Z=$(find . -maxdepth 2 -iname '*.zip' -not -path './.git/*' | head -1)
             if [ -n "$Z" ]; then
@@ -66,13 +70,25 @@ jobs:
 
       - name: Install dependencies
         working-directory: ${{ env.PROJECT_DIR }}
-        run: npm install --no-audit --no-fund
+        run: |
+          node -e '
+            const fs = require("fs");
+            const p = JSON.parse(fs.readFileSync("package.json", "utf8"));
+            p.dependencies = p.dependencies || {};
+            p.devDependencies = p.devDependencies || {};
+            delete p.dependencies.express;
+            if (!p.dependencies["electron-updater"]) p.dependencies["electron-updater"] = "^6.3.9";
+            if (!p.devDependencies.electron) p.devDependencies.electron = "^33.2.1";
+            if (!p.devDependencies["electron-builder"]) p.devDependencies["electron-builder"] = "^25.1.8";
+            fs.writeFileSync("package.json", JSON.stringify(p, null, 2) + "\n");
+          '
+          npm install --no-audit --no-fund
 
       - name: Build installers
         working-directory: ${{ env.PROJECT_DIR }}
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
-        run: npx electron-builder --publish never
+        run: npm run dist -- --publish never
 
       - name: Collect files
         run: |
@@ -112,4 +128,8 @@ jobs:
         run: |
           ls -la release_files
           git log -1 --pretty=%B > notes.txt || echo "Dr. Wael $V" > notes.txt
-          gh release create "v$V" release_files/* --title "Dr. Wael $V" --notes-file notes.txt --latest
+          if gh release view "v$V" >/dev/null 2>&1; then
+            gh release upload "v$V" release_files/* --clobber
+          else
+            gh release create "v$V" release_files/* --title "Dr. Wael $V" --notes-file notes.txt --latest
+          fi
