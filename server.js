@@ -41,6 +41,11 @@ app.get('/course-features.js', (_req, res) => {
   res.sendFile(path.join(__dirname, 'app', 'course-features.js'));
 });
 
+app.get('/student-badges.js', (_req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
+  res.sendFile(path.join(__dirname, 'app', 'student-badges.js'));
+});
+
 app.get('/favicon.ico', (_req, res) => {
   const icon = path.join(__dirname, 'build', 'icon.png');
   if (fs.existsSync(icon)) {
