@@ -10,9 +10,9 @@
   "private": true,
   "scripts": {
     "dev": "node server.js",
-    "build": "node -e \"const fs=require('fs');if(!fs.existsSync('app/index.html'))process.exit(1);console.log('Build OK')\"",
+    "build": "node scripts/build-html.js",
     "start": "node server.js",
-    "lint": "node --check server.js main.js preload.js bridge.js dialog-preload.js app/course-alerts.js app/course-features.js app/student-badges.js tests/course-alerts.test.js tests/course-features.test.js tests/student-badges.test.js && node -e \"const fs=require('fs'),vm=require('vm'),h=fs.readFileSync('app/index.html','utf8');for(const m of h.matchAll(/<script(?![^>]*\\\\bsrc=)[^>]*>([\\\\s\\\\S]*?)<\\\\/script>/gi))new vm.Script(m[1]);console.log('Lint OK')\"",
+    "lint": "node --check server.js main.js preload.js bridge.js dialog-preload.js scripts/build-html.js app/course-alerts.js app/course-features.js app/student-badges.js app/progress-chart.js tests/course-alerts.test.js tests/course-features.test.js tests/student-badges.test.js tests/progress-chart.test.js tests/standalone-html.test.js && node -e \"const fs=require('fs'),vm=require('vm'),h=fs.readFileSync('app/index.html','utf8');for(const m of h.matchAll(/<script(?![^>]*\\\\bsrc=)[^>]*>([\\\\s\\\\S]*?)<\\\\/script>/gi))new vm.Script(m[1]);console.log('Lint OK')\"",
     "electron:start": "electron .",
     "dist": "electron-builder"
   },

@@ -496,6 +496,45 @@ html[data-theme=dark] .bdg-card.earned.tier-bronze .bdg-ico{background:rgba(251,
 html[data-theme=dark] .bdg-card.earned .bdg-state,html[data-theme=dark] .bdg-card.earned .bdg-prog-txt{color:#6ee7b7}
 html[data-theme=dark] .bdg-mini,html[data-theme=dark] .bdg-bar{background:rgba(255,255,255,.14)}
 html[data-theme=dark] .bdg-modal-ico{background:rgba(245,168,58,.2);color:var(--gold);border-color:rgba(245,168,58,.45)}
+.upd-bar{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;background:var(--card);border:1px solid var(--gold);border-radius:18px;padding:13px 14px;margin-bottom:12px;box-shadow:0 4px 14px rgba(178,33,39,.08)}
+.upd-bar-main{min-width:0;flex:1}
+.upd-bar-ttl{font-size:14.5px;font-weight:700;color:var(--ink);margin-bottom:3px;display:flex;align-items:center;gap:6px}
+.upd-bar-ttl svg{color:var(--gold);flex:none}
+.upd-bar-body{font-size:13px;line-height:1.55;color:var(--mute)}
+.upd-bar-acts{display:flex;align-items:center;gap:8px;margin-top:9px;flex-wrap:wrap}
+.upd-bar-acts .btn{width:auto;padding:8px 14px;font-size:13px;min-height:38px}
+.ntag.upd{background:#fde8ea;color:#b22127}
+html[data-theme=dark] .ntag.upd{background:#47161d;color:#fda4af}
+.dsh-chart-card{grid-column:1/-1;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px;text-align:start;box-shadow:0 2px 12px rgba(20,25,60,.05)}
+.dsh-chart-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.dsh-chart-ttl{font-size:15.5px;font-weight:700;color:var(--ink);margin:0 0 3px}
+.dsh-chart-meta{font-size:12.5px;font-weight:600;color:var(--mute);font-variant-numeric:tabular-nums}
+.dsh-seg{display:inline-flex;gap:4px;padding:4px;border-radius:12px;background:var(--g2);border:1px solid var(--line)}
+.dsh-seg button{min-height:36px;padding:6px 11px;border-radius:8px;font-size:12.5px;font-weight:700;color:var(--mute);white-space:nowrap;transition:background .15s,color .15s}
+.dsh-seg button[aria-pressed="true"]{background:var(--navy);color:#fff}
+html[data-theme=dark] .dsh-seg button[aria-pressed="true"]{background:var(--gold);color:#1a1200}
+.dsh-svg-wrap{width:100%;overflow:hidden}
+.dsh-svg-wrap svg{display:block;width:100%;height:auto;overflow:visible}
+.dsh-bar-row{cursor:pointer}
+.dsh-tip{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:8px;padding:9px 12px;border-radius:12px;background:var(--g2);border:1px solid var(--line);font-size:12.5px;color:var(--ink);font-variant-numeric:tabular-nums}
+.dsh-tip small{color:var(--mute);font-weight:600}
+.dsh-tip-btn{padding:5px 11px;border-radius:8px;background:var(--navy);color:#fff;font-size:12px;font-weight:700;white-space:nowrap}
+html[data-theme=dark] .dsh-tip-btn{background:var(--gold);color:#1a1200}
+.dsh-empty{text-align:center;padding:22px 10px;font-size:13px;font-weight:600;color:var(--mute)}
+.dl-plat-note{margin:8px 0 0;font-size:12.5px;font-weight:700;color:var(--navy)}
+html[data-theme=dark] .dl-plat-note{color:var(--gold)}
+.dldesk-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:8px}
+@media (max-width:480px){.dldesk-grid{grid-template-columns:1fr}}
+.dl-os{display:flex;flex-direction:column;gap:6px;padding:12px;border-radius:16px;border:1px solid var(--line);background:var(--g2);text-align:start}
+.dl-os.rec{border-color:var(--gold);background:rgba(245,168,58,.1)}
+.dl-os b{font-size:14px;color:var(--ink)}
+.dl-os small{font-size:12px;color:var(--mute);font-variant-numeric:tabular-nums}
+.dl-os a.btn{padding:9px 10px;font-size:13px;text-decoration:none;text-align:center}
+.dl-os-alt{font-size:12px;font-weight:700;color:var(--navy);text-decoration:underline;text-align:center;padding:2px 0;pointer-events:auto}
+html[data-theme=dark] .dl-os-alt{color:var(--gold)}
+.dl-rel-links{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;font-size:12.5px;font-weight:700}
+.dl-rel-links a{color:var(--navy);text-decoration:underline;pointer-events:auto}
+html[data-theme=dark] .dl-rel-links a{color:var(--gold)}
 html,body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 input,textarea,[contenteditable]{-webkit-user-select:text;user-select:text}
 img,video,canvas{-webkit-user-drag:none}
@@ -515,9 +554,12 @@ body.dw-blur>:not(#dw-shield){filter:blur(24px)}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/mhchem.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script>if(!window.d3){document.write('<scr'+'ipt src="d3.min.js"></scr'+'ipt>')}</script>
 <script src="course-alerts.js"></script>
 <script src="course-features.js"></script>
 <script src="student-badges.js"></script>
+<script src="progress-chart.js"></script>
 </head><body>
 <div id="dw-shield" aria-hidden="true"><b>محتوى محمي</b><span>التصوير أو لقطة الشاشة غير مسموح · Protected content — Screenshots blocked</span></div>
 <div id="dw-wm" aria-hidden="true"></div>
@@ -1759,7 +1801,7 @@ let mode="login",sx={};
 function buildAuth(){const a=$("#aform");$("#amsg").textContent="";$("#amsg").className="";
 $$("#atabs button").forEach(b=>{b.textContent=t(b.dataset.m);b.classList.toggle("on",b.dataset.m===mode)});
 const f=(id,ph,ty="text",ex="")=>`<input class="fi" id="${id}" type="${ty}" placeholder="${esc(ph)}" autocomplete="off" ${ex}>`;
-if(mode==="login"){a.innerHTML=f("i_id",t("idph"))+f("i_pw",t("pw"),"password")+`<button class="btn gold" id="go">${t("login")}</button><button class="btn ghost" id="fg" style="margin-top:8px">${t("forgot")}</button><button class="btn ghost" id="gg" style="margin-top:8px">${t("google")}</button><button class="btn ghost" id="tlk" style="margin-top:8px">${t("terms")}</button>${NAT?`<button class="btn ghost" id="offb0" style="margin-top:8px">${L("التحميلات (بدون إنترنت)","Downloads (offline)")}</button>`:`<button class="btn ghost" id="dlb" style="margin-top:8px">${L("تحميل تطبيق الأندرويد","Download the Android app")}</button>`}`;$("#tlk").onclick=showTerms;if($("#dlb"))$("#dlb").onclick=showDl;if($("#offb0"))$("#offb0").onclick=showOff;$("#go").onclick=login;$("#fg").onclick=forgot;$("#gg").onclick=google;return}
+if(mode==="login"){a.innerHTML=f("i_id",t("idph"))+f("i_pw",t("pw"),"password")+`<button class="btn gold" id="go">${t("login")}</button><button class="btn ghost" id="fg" style="margin-top:8px">${t("forgot")}</button><button class="btn ghost" id="gg" style="margin-top:8px">${t("google")}</button><button class="btn ghost" id="tlk" style="margin-top:8px">${t("terms")}</button>${NAT?`<button class="btn ghost" id="offb0" style="margin-top:8px">${L("التحميلات (بدون إنترنت)","Downloads (offline)")}</button>`:`<button class="btn ghost" id="dlb" style="margin-top:8px">${L("تحميل التطبيق (أندرويد وسطح المكتب)","Download app (Android & Desktop)")}</button>`}`;$("#tlk").onclick=showTerms;if($("#dlb"))$("#dlb").onclick=showDl;if($("#offb0"))$("#offb0").onclick=showOff;$("#go").onclick=login;$("#fg").onclick=forgot;$("#gg").onclick=google;return}
 a.innerHTML=f("s_ar",t("nAr"))+f("s_en",t("nEn"))+f("s_em",t("email"),"email")+`<div class="phr"><span>+20</span>${f("s_ph",t("phone"),"tel",'maxlength="11" inputmode="numeric"')}</div><select class="fi" id="s_yr"><option value="1">${t("yr")}: ${t("y1")}</option><option value="2">${t("yr")}: ${t("y2")}</option><option value="3">${t("yr")}: ${t("y3")}</option></select><select class="fi" id="s_tm"><option value="1">${t("t1")}</option><option value="2">${t("t2")}</option></select><label class="agree"><input type="checkbox" id="s_bk"><span class="box"></span><span>${t("back")}</span></label><div id="s_ex" class="hide"></div>`+f("s_pw",t("pw"),"password")+f("s_pw2",t("pw2"),"password")+`<label class="agree"><input type="checkbox" id="s_tc"><span class="box"></span><span>${t("tAgree")} <u id="s_tl">${t("terms")}</u></span></label><button class="btn gold" id="go">${t("signup")}</button>`;
 $("#s_tl").onclick=e=>{e.preventDefault();showTerms()};$("#go").onclick=signup;$("#s_bk").onchange=exLoad;$("#s_tm").onchange=exLoad;$("#s_yr").onchange=exLoad;exLoad()}
 $$("#atabs button").forEach(b=>b.onclick=()=>{mode=b.dataset.m;buildAuth()});
@@ -2201,25 +2243,160 @@ function vNotif(){
     ${permDenied?`<div class="small" style="margin-top:8px;color:var(--err)">${L("تم رفض إذن إشعارات المتصفح. ستصلك التنبيهات داخل التطبيق وهنا.","Browser notifications are blocked; alerts will still appear in-app and here.")}</div>`:""}
   </div>`;
   const listH=all.length?all.map(n=>{
-    const cls=n.kind==="due"?"due":n.kind==="lecture"?"lec":n.kind==="badge"?"bdg":"sys";
-    const lbl=n.kind==="due"?L("موعد تسليم قريب","Task deadline"):n.kind==="lecture"?L("محاضرة جديدة","New lecture"):n.kind==="badge"?L("وسام جديد","New badge"):L("إشعار المنصة","Platform");
+    const cls=n.kind==="due"?"due":n.kind==="lecture"?"lec":n.kind==="badge"?"bdg":n.kind==="update"?"upd":"sys";
+    const lbl=n.kind==="due"?L("موعد تسليم قريب","Task deadline"):n.kind==="lecture"?L("محاضرة جديدة","New lecture"):n.kind==="badge"?L("وسام جديد","New badge"):n.kind==="update"?L("تحديث التطبيق","App update"):L("إشعار المنصة","Platform");
     const hasCourse=n.courseId&&CS.some(c=>c.id===n.courseId);
-    return`<div class="item"><span class="ntag ${cls}">${lbl}</span><div class="nm">${esc(n.title)}</div><div class="tx">${linkify(esc(n.body))}</div><div class="small">${fd(n.at)}</div>${hasCourse?`<div class="acts"><button class="pl" data-nc="${esc(n.courseId)}">${L("فتح الدورة","Open course")}</button></div>`:""}</div>`;
+    const hasUpd=n.kind==="update";
+    return`<div class="item"><span class="ntag ${cls}">${lbl}</span><div class="nm">${esc(n.title)}</div><div class="tx">${linkify(esc(n.body))}</div><div class="small">${fd(n.at)}</div>${hasCourse||hasUpd?`<div class="acts">${hasCourse?`<button class="pl" data-nc="${esc(n.courseId)}">${L("فتح الدورة","Open course")}</button>`:""}${hasUpd?`<button class="dl" data-nu="${esc(n.action||"download")}">${n.action==="reload"?L("تحديث الصفحة","Refresh page"):L("عرض التحديث والتحميل","View update & download")}</button>`:""}</div>`:""}</div>`;
   }).join(""):`<div class="empty">${t("noN")}</div>`;
   sub(t("notif"),topBar+listH);
   if($("#npb"))$("#npb").onclick=async()=>{try{const r=await Notification.requestPermission();if(r==="granted")toast(L("تم تفعيل إشعارات المتصفح","Browser notifications enabled"));vNotif()}catch(e){}};
-  $("#ncb").onclick=async()=>{const b=$("#ncb");b.disabled=true;try{await checkCourseAlerts({force:true});toast(L("تم فحص المواعيد والمحاضرات","Deadlines & lectures checked"))}catch(e){}b.disabled=false;vNotif()};
+  $("#ncb").onclick=async()=>{const b=$("#ncb");b.disabled=true;try{await Promise.allSettled([checkCourseAlerts({force:true}),checkAppUpdates({force:true,manual:true})]);toast(L("تم فحص المواعيد والمحاضرات والتحديثات","Deadlines, lectures & updates checked"))}catch(e){}b.disabled=false;vNotif()};
   if($("#ncl"))$("#ncl").onclick=()=>{saveLNT([]);hdr();vNotif()};
   $$("[data-nc]").forEach(b=>b.onclick=()=>vCourse(b.dataset.nc));
+  $$("[data-nu]").forEach(b=>b.onclick=()=>{if(b.dataset.nu==="reload")location.reload();else showDl()});
 }
 async function vMyPays(){sub(t("myPays"),`<div id="pl2"></div>`);const s=await db.collection("payments").where("uid","==",U.uid).limit(100).get();const l=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>b.createdAt-a.createdAt);$("#pl2").innerHTML=l.length?l.map(p=>`<div class="item"><div class="nm">${esc(p.title)} — ${esc(p.amount)} ${t("egp")}</div><div class="meta">${stLbl(p.status)} · ${fd(p.createdAt)}</div>${invBtns(p)}</div>`).join(""):`<div class="empty">${t("none2")}</div>`;wireInv()}
 const safeMsg=e=>String((e&&(e.code||e.message))||"").replace(/projects\/[^\s]*/gi,"").replace(/https?:\/\/\S+/gi,"").replace(/\([a-z0-9\-]{6,}\)/gi,"").slice(0,70);
-/* ===== download page ===== */
+/* ===== download page & app update notifications ===== */
 Object.assign(T.ar,{dl:"تحميل التطبيق"});Object.assign(T.en,{dl:"Download the app"});
 I.download='<path d="M12 4v11M7 11l5 5 5-5M5 20h14"/>';
-const DESK_BASE="https://github.com/khaledahmed34567/DrWael-Desktop/releases/latest/download/",DL_REPO="khaledahmed34567/DrWael-Androidapp",DL_APK="https://github.com/"+DL_REPO+"/releases/latest/download/DrWael.apk";
+const APP_WEB_VER="2.1.0";
+const DESK_REPO="khaledahmed34567/DrWael-Desktop",DESK_BASE="https://github.com/"+DESK_REPO+"/releases/latest/download/";
+const DL_REPO="khaledahmed34567/DrWael-Androidapp",DL_APK="https://github.com/"+DL_REPO+"/releases/latest/download/DrWael.apk";
 const isAdm=()=>!!(P&&(P.role==="admin"||(U&&U.email==="khwailedapp@gmail.com")));
-async function dlInfo(){try{const r=await fetch("https://api.github.com/repos/"+DL_REPO+"/releases/latest",{headers:{Accept:"application/vnd.github+json"}});return r.ok?await r.json():null}catch(e){return null}}
+let _relCache=null,_relCacheAt=0,_appUpdateState=null,_proxyDl=!NAT&&location.protocol.startsWith("http");
+async function dlInfo(repo){try{const r=await fetch("https://api.github.com/repos/"+(repo||DL_REPO)+"/releases/latest",{headers:{Accept:"application/vnd.github+json"}});return r.ok?await r.json():null}catch(e){return null}}
+async function fetchReleasesInfo(force){
+  const lsKey="dw_rel_cache_v2",isHttp=location.protocol.startsWith("http");
+  if(!force&&_relCache&&Date.now()-_relCacheAt<216e5)return _relCache;
+  if(!force){
+    try{
+      const saved=JSON.parse(ls.get(lsKey)||"null");
+      if(saved&&saved.at&&Date.now()-saved.at<216e5&&(!isHttp||saved.proxy===true)){_proxyDl=!!saved.proxy;_relCache=saved.data;_relCacheAt=saved.at;return _relCache}
+    }catch(e){}
+  }
+  const pc=window.DWProgressChart;
+  let apiData=null;
+  if(isHttp){
+    try{
+      const ar=await fetch("/api/releases"+(force?"?force=1":""));
+      if(ar.ok){
+        const j=await ar.json();
+        if(j&&j.ok){apiData=j;_proxyDl=true}
+      }else{_proxyDl=false}
+    }catch(e){}
+  }else{_proxyDl=false}
+  const[aRaw,dRaw,appDoc]=await Promise.all([
+    apiData?Promise.resolve(apiData.android):(_proxyDl?Promise.resolve(null):dlInfo(DL_REPO)),
+    apiData?Promise.resolve(apiData.desktop):(_proxyDl?Promise.resolve(null):dlInfo(DESK_REPO)),
+    (async()=>{try{if(!window.db)return null;const d=await db.doc("settings/app").get();return d.exists?d.data():null}catch(e){return null}})()
+  ]);
+  const data={
+    android:apiData?aRaw:(pc?pc.normalizeReleaseInfo(aRaw,"android"):aRaw),
+    desktop:apiData?dRaw:(pc?pc.normalizeReleaseInfo(dRaw,"desktop"):dRaw),
+    remoteConfig:appDoc||{}
+  };
+  _relCache=data;_relCacheAt=Date.now();
+  try{ls.set(lsKey,JSON.stringify({at:_relCacheAt,proxy:!!_proxyDl,data}))}catch(e){}
+  return data;
+}
+function renderUpdateBannerHTML(){
+  const u=_appUpdateState;
+  if(!u||!u.hasUpdate||!u.shouldBanner)return"";
+  const actTxt=u.ctaLabel||(u.channel==="web"?L("تحديث الصفحة","Refresh page"):L("روابط التحميل والتحديث","Download & update"));
+  return`<div class="upd-bar" id="updBanner" role="region" aria-label="${esc(L("إشعار التحديث","Update notification"))}">
+    <div class="upd-bar-main">
+      <div class="upd-bar-ttl">${ic("download",17)}<span>${esc(u.title)}</span></div>
+      <div class="upd-bar-body">${esc(u.body)}</div>
+      <div class="upd-bar-acts">
+        <button type="button" class="btn gold" id="updGo">${esc(actTxt)}</button>
+        ${u.force?"":`<button type="button" class="btn ghost" id="updDis">${L("تجاهل","Later")}</button>`}
+      </div>
+    </div>
+  </div>`;
+}
+function mountUpdateBanner(){
+  const host=$("#updHost");
+  if(!host)return;
+  host.innerHTML=renderUpdateBannerHTML();
+  if($("#updGo")){
+    $("#updGo").onclick=()=>{
+      const u=_appUpdateState;
+      if(!u)return;
+      if(u.channel==="web")location.reload();
+      else if(DESK&&u.channel==="desktop"){nreq("update");showDl()}
+      else showDl();
+    };
+  }
+  if($("#updDis")){
+    $("#updDis").onclick=()=>{
+      const u=_appUpdateState;
+      if(u){
+        ls.set("dw_seen_rel_ver",u.dismissKey||u.latestVersion||"");
+        u.shouldBanner=false;
+      }
+      host.innerHTML="";
+    };
+  }
+}
+async function checkAppUpdates(opts){
+  const pc=window.DWProgressChart;
+  if(!pc)return null;
+  const force=!!(opts&&opts.force),manual=!!(opts&&opts.manual);
+  const rels=await fetchReleasesInfo(force);
+  const plat=pc.detectClientPlatform(navigator.userAgent,window.DWNative&&DWNative.platform);
+  const seenVersion=manual?"":(ls.get("dw_seen_rel_ver")||"");
+  const res=pc.evaluateAppUpdate({
+    isNative:NAT,
+    isDesktop:DESK,
+    currentVer:VER||"1.0.0",
+    currentWebVer:APP_WEB_VER,
+    desktopRelease:rels&&rels.desktop,
+    androidRelease:rels&&rels.android,
+    remoteConfig:(rels&&rels.remoteConfig)||{},
+    seenVersion,
+    platform:plat,
+    lang:lang||"ar"
+  });
+  _appUpdateState=res;
+  mountUpdateBanner();
+  if(res&&res.hasUpdate&&(res.shouldNotify||manual)){
+    const nid="app_upd_"+res.channel+"_"+res.latestVersion;
+    if(U&&P){
+      emitLocalAlert({
+        id:nid,
+        kind:"update",
+        title:res.title,
+        body:res.body,
+        action:res.channel==="web"?"reload":"download",
+        at:Date.now()
+      });
+    }
+    if(manual){
+      toast(res.title);
+      if(DESK&&res.channel==="desktop")nreq("update");
+    }
+  }else if(manual){
+    toast(L("أنت تستخدم أحدث إصدار بالفعل","You are already on the latest version"));
+  }
+  return res;
+}
+window.addEventListener("dw-update",ev=>{
+  const d=ev&&ev.detail||{};
+  const v=String(d.version||"");
+  const isReady=d.status==="downloaded";
+  const title=isReady
+    ?L("تم تحميل التحديث الجديد"+(v?" v"+v:""),"Update"+(v?" v"+v:"")+" downloaded")
+    :L("يتوفر تحديث جديد لسطح المكتب"+(v?" v"+v:""),"Desktop update"+(v?" v"+v:"")+" available");
+  const bodyTxt=isReady
+    ?L("أعد تشغيل التطبيق لتطبيق التحديث الجديد.","Restart the app to install the update.")
+    :L("جاري تنزيل التحديث في الخلفية تلقائيًا.","Downloading update automatically in the background.");
+  _appUpdateState={hasUpdate:true,shouldNotify:true,shouldBanner:true,channel:"desktop",latestVersion:v||"new",title,body:bodyTxt,ctaLabel:L("روابط التحميل والتحديث","Download & updates")};
+  mountUpdateBanner();
+  if(U&&P)emitLocalAlert({id:"desk_upd_"+(d.status||"")+"_"+(v||Date.now()),kind:"update",title,body:bodyTxt,action:"download",at:Date.now()});
+  else toast(title);
+});
 async function dlShots(){try{const d=await db.doc("settings/appdl").get();return d.exists&&Array.isArray(d.data().shots)?d.data().shots:[]}catch(e){return null}}
 function viewDl(u){const v=document.createElement("div");v.id="dlv2";v.innerHTML=`<img alt="" src="${esc(u)}">`;v.onclick=()=>v.remove();document.body.appendChild(v)}
 async function dlGallery(){const g=$("#dlg");if(!g)return;const sh=await dlShots(),adm=isAdm();
@@ -2229,15 +2406,123 @@ g.querySelectorAll("img").forEach(im=>im.onclick=()=>viewDl(im.src));
 g.querySelectorAll(".del").forEach(b=>b.onclick=async()=>{if(!confirm(L("حذف هذه الصورة؟","Delete this image?")))return;try{await db.doc("settings/appdl").set({shots:firebase.firestore.FieldValue.arrayRemove(sh[+b.dataset.d])},{merge:true})}catch(e){}dlGallery()});
 const ad=$("#dlad");if(ad&&adm){ad.innerHTML=`<label class="btn ghost" style="margin-top:10px;display:block;text-align:center">${L("رفع صور من التطبيق","Upload app screenshots")}<input type="file" id="dlf" accept="image/*" multiple hidden></label><p class="small" id="dlm"></p>`;
 $("#dlf").onchange=async e=>{const fs=[...e.target.files].slice(0,12),m=$("#dlm");if(!fs.length)return;const urls=[];try{for(let i=0;i<fs.length;i++){m.textContent=L("جاري الرفع ","Uploading ")+(i+1)+" / "+fs.length;urls.push(await imgbb(fs[i]))}await db.doc("settings/appdl").set({shots:firebase.firestore.FieldValue.arrayUnion(...urls)},{merge:true});dlGallery()}catch(x){m.textContent=L("تعذر الرفع. تأكد من قواعد الحماية لـ settings/appdl.","Upload failed. Check the security rule for settings/appdl.")}}}}
-function showDl(){const old=$("#dlp");if(old)old.remove();const o=document.createElement("div");o.id="dlp";
-o.innerHTML=`<div class="dlh"><button class="dlx" id="dlx">${ic("x")}</button><span>${L("تحميل التطبيق","Download the app")}</span></div><div class="dlb"><div class="dlhero"><img class="dlogo" alt="" src="${LOGO[lang]}"><p>${L("تطبيق أندرويد رسمي","Official Android app")}</p><div class="dlchip" id="dlv">${L("جاري التحقق من آخر إصدار…","Checking the latest version…")}</div><a class="btn gold dla" id="dla" href="${DL_APK}" target="_blank" rel="noopener">${ic("download",20)}<span>${L("تحميل التطبيق (APK)","Download the app (APK)")}</span></a><p class="small" id="dls" style="color:#fff;opacity:.8;margin-top:8px"></p></div><div class="card"><h2>${L("تطبيق سطح المكتب","Desktop app")}</h2><div class="dldesk"><a class="btn ghost" href="${DESK_BASE}DrWael-Setup.exe" target="_blank" rel="noopener">Windows</a><a class="btn ghost" href="${DESK_BASE}DrWael-mac.dmg" target="_blank" rel="noopener">macOS</a><a class="btn ghost" href="${DESK_BASE}DrWael-linux.AppImage" target="_blank" rel="noopener">Linux</a></div></div><div class="card" id="dln" style="display:none"></div><div class="card"><h2>${L("لقطات من التطبيق","App screenshots")}</h2><div class="dlg" id="dlg"></div><div id="dlad"></div></div><div class="card"><h2>${L("طريقة التثبيت","How to install")}</h2><ol class="dlsteps"><li>${L("نزّل الملف من الزر بالأعلى.","Download the file with the button above.")}</li><li>${L("افتح الملف واسمح بالتثبيت من هذا المصدر عند الطلب.","Open it and allow installing from this source when asked.")}</li><li>${L("ثبّت التطبيق وافتحه وسجّل دخولك.","Install the app, open it and sign in.")}</li><li>${L("التحديثات الجديدة تظهر لك داخل التطبيق تلقائيًا.","New updates appear inside the app automatically.")}</li></ol></div></div>`;
-document.body.appendChild(o);$("#dlx").onclick=()=>o.remove();
-dlInfo().then(r=>{const v=$("#dlv");if(!v)return;if(!r||!r.tag_name){v.style.display="none";return}
-const a=(r.assets||[]).find(x=>/\.apk$/i.test(x.name)),mb=a?(a.size/1048576).toFixed(1)+" MB":"";
-v.textContent=L("الإصدار ","Version ")+String(r.tag_name).replace(/^v/i,"");
-$("#dls").textContent=[mb,r.published_at?new Date(r.published_at).toLocaleDateString(lang==="ar"?"ar-EG":"en-GB"):""].filter(Boolean).join(" · ");
-const n=(r.body||"").replace(/\[force\]/ig,"").trim();if(n){const d=$("#dln");d.style.display="";d.innerHTML=`<h2>${L("ما الجديد","What's new")}</h2><p class="small" style="white-space:pre-wrap">${esc(n.slice(0,800))}</p>`}});
-dlGallery()}
+function showDl(){
+  const old=$("#dlp");if(old)old.remove();
+  const pc=window.DWProgressChart;
+  const plat=pc?pc.detectClientPlatform(navigator.userAgent,window.DWNative&&DWNative.platform):"android";
+  const platName={android:"Android",win:"Windows",mac:"macOS",linux:"Linux"}[plat]||"Android";
+  const fmtDt=d=>{if(!d)return"";try{return new Date(d).toLocaleDateString(lang==="ar"?"ar-EG":"en-GB")}catch(e){return""}};
+  const o=document.createElement("div");o.id="dlp";
+  const useP=!NAT&&location.protocol.startsWith("http")&&_proxyDl!==false;
+  const uApk=useP?"/dl/android":DL_APK;
+  const uWin=useP?"/dl/win":DESK_BASE+"DrWael-Setup.exe";
+  const uMac=useP?"/dl/mac":DESK_BASE+"DrWael-mac.dmg";
+  const uMacZip=useP?"/dl/mac-zip":DESK_BASE+"DrWael-mac.zip";
+  const uLnx=useP?"/dl/linux":DESK_BASE+"DrWael-linux.AppImage";
+  const uLnxDeb=useP?"/dl/linux-deb":DESK_BASE+"DrWael-linux.deb";
+  o.innerHTML=`<div class="dlh"><button class="dlx" id="dlx" aria-label="${esc(t("close"))}">${ic("x")}</button><span>${L("تحميل التطبيق والتحديثات","App downloads & updates")}</span></div>
+  <div class="dlb">
+    <div class="dlhero">
+      <img class="dlogo" alt="" src="${LOGO[lang]}">
+      <p>${L("تطبيق د. وائل الرسمي للأندرويد وسطح المكتب","Official Dr. Wael app for Android & Desktop")}</p>
+      <div class="dlchip" id="dlv">${L("جاري التحقق من آخر إصدار…","Checking the latest version…")}</div>
+      <a class="btn gold dla" id="dla" href="${uApk}" download="DrWael.apk" rel="noopener noreferrer">${ic("download",20)}<span>${L("تحميل تطبيق الأندرويد (APK)","Download Android app (APK)")}</span></a>
+      <p class="small" id="dls" style="color:#fff;opacity:.88;margin-top:8px">${L("النسخة الحالية على الويب","Current web build")}: v${APP_WEB_VER}</p>
+    </div>
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
+        <h2 style="margin:0">${L("تطبيق سطح المكتب","Desktop app")}</h2>
+        <span class="small" id="dldv" style="margin:0;font-weight:700;font-variant-numeric:tabular-nums">${L("جاري جلب الإصدار…","Checking release…")}</span>
+      </div>
+      <p class="dl-plat-note">${L("نظام جهازك المكتشف: ","Detected device: ")}${esc(platName)}${VER?" · "+L("الإصدار المثبت","Installed")+": v"+esc(VER):""}</p>
+      <div class="dldesk-grid">
+        <div class="dl-os${plat==="win"?" rec":""}">
+          <b>Windows</b>
+          <small id="dlwinSz">Installer (.exe · x64)</small>
+          <a class="btn ghost" id="dlwinA" href="${uWin}" download="DrWael-Setup.exe" rel="noopener noreferrer">${L("تحميل Windows","Download .exe")}</a>
+        </div>
+        <div class="dl-os${plat==="mac"?" rec":""}">
+          <b>macOS</b>
+          <small id="dlmacSz">Universal (.dmg / .zip)</small>
+          <a class="btn ghost" id="dlmacA" href="${uMac}" download="DrWael-mac.dmg" rel="noopener noreferrer">${L("تحميل macOS","Download .dmg")}</a>
+          <a class="dl-os-alt" id="dlmacZip" href="${uMacZip}" download="DrWael-mac.zip" rel="noopener noreferrer">${L("نسخة ZIP المضغوطة","Portable .zip")}</a>
+        </div>
+        <div class="dl-os${plat==="linux"?" rec":""}">
+          <b>Linux</b>
+          <small id="dllnxSz">AppImage / Debian (.deb)</small>
+          <a class="btn ghost" id="dllnxA" href="${uLnx}" download="DrWael-linux.AppImage" rel="noopener noreferrer">${L("تحميل AppImage","Download AppImage")}</a>
+          <a class="dl-os-alt" id="dllnxDeb" href="${uLnxDeb}" download="DrWael-linux.deb" rel="noopener noreferrer">${L("حزمة .deb (أوبونتو/ديبيان)","Debian .deb package")}</a>
+        </div>
+      </div>
+      <button type="button" class="btn ghost" id="dlchk" style="margin-top:10px">${L("فحص التحديثات الآن","Check for updates now")}</button>
+      <div id="dlchkMsg"></div>
+    </div>
+    <div class="card" id="dln" style="display:none"></div>
+    <div class="card"><h2>${L("لقطات من التطبيق","App screenshots")}</h2><div class="dlg" id="dlg"></div><div id="dlad"></div></div>
+    <div class="card"><h2>${L("طريقة التثبيت والتحديث","How to install & update")}</h2><ol class="dlsteps"><li>${L("اختر النسخة المناسبة لجهازك (APK للأندرويد أو مُثبّت Windows / macOS / Linux لسطح المكتب).","Choose the installer for your device (APK for Android or Windows / macOS / Linux for Desktop).")}</li><li>${L("افتح الملف واسمح بالتثبيت عند الطلب، ثم افتح التطبيق وسجّل دخولك بنفس حسابك.","Open the installer, allow installation if prompted, then launch and sign in with your account.")}</li><li>${L("تحديثات سطح المكتب تُحمّل تلقائيًا على ويندوز ولينكس، وتصلك إشعارات التحديث داخل المنصة فور توفر إصدار جديد.","Desktop updates download automatically on Windows & Linux, and in-app notifications alert you whenever a new release ships.")}</li></ol></div>
+  </div>`;
+  document.body.appendChild(o);
+  $("#dlx").onclick=()=>o.remove();
+  const applyRelUI=async(force)=>{
+    const rels=await fetchReleasesInfo(force);
+    if(!$("#dlp"))return;
+    const ar=rels&&rels.android,dr=rels&&rels.desktop,px=!NAT&&_proxyDl&&location.protocol.startsWith("http");
+    const v=$("#dlv"),s=$("#dls");
+    if($("#dla")&&px)$("#dla").href="/dl/android";
+    if(ar&&ar.version){
+      const apk=ar.picked&&ar.picked.apk;
+      if(!px&&apk&&apk.url&&$("#dla"))$("#dla").href=apk.url;
+      if(v)v.textContent=L("الأندرويد: الإصدار ","Android v")+ar.version;
+      if(s)s.textContent=[apk&&apk.sizeLabel,fmtDt(ar.publishedAt)].filter(Boolean).join(" · ");
+    }else if(v){
+      v.textContent=L("أحدث إصدار APK مباشر","Direct latest APK download");
+    }
+    const dv=$("#dldv");
+    if(px){
+      if($("#dlwinA"))$("#dlwinA").href="/dl/win";
+      if($("#dlmacA"))$("#dlmacA").href="/dl/mac";
+      if($("#dlmacZip"))$("#dlmacZip").href="/dl/mac-zip";
+      if($("#dllnxA"))$("#dllnxA").href="/dl/linux";
+      if($("#dllnxDeb"))$("#dllnxDeb").href="/dl/linux-deb";
+    }
+    if(dr&&dr.version){
+      if(dv)dv.textContent=L("الإصدار ","v")+dr.version+(dr.publishedAt?" · "+fmtDt(dr.publishedAt):"");
+      const p=dr.picked||{};
+      if(!px&&p.win&&p.win.url&&$("#dlwinA"))$("#dlwinA").href=p.win.url;
+      if(p.win&&p.win.sizeLabel&&$("#dlwinSz"))$("#dlwinSz").textContent=".exe · "+p.win.sizeLabel;
+      if(!px&&p.mac&&p.mac.url&&$("#dlmacA"))$("#dlmacA").href=p.mac.url;
+      if(!px&&p.macZip&&p.macZip.url&&$("#dlmacZip"))$("#dlmacZip").href=p.macZip.url;
+      if(p.mac&&p.mac.sizeLabel&&$("#dlmacSz"))$("#dlmacSz").textContent=".dmg · "+p.mac.sizeLabel;
+      if(!px&&p.linuxApp&&p.linuxApp.url&&$("#dllnxA"))$("#dllnxA").href=p.linuxApp.url;
+      if(!px&&p.linuxDeb&&p.linuxDeb.url&&$("#dllnxDeb"))$("#dllnxDeb").href=p.linuxDeb.url;
+      if(p.linuxApp&&p.linuxApp.sizeLabel&&$("#dllnxSz"))$("#dllnxSz").textContent="AppImage · "+p.linuxApp.sizeLabel;
+    }else if(dv){
+      dv.textContent=L("أحدث إصدار رسمي","Latest official release");
+    }
+    const notes=[ar&&ar.notes?(L("الأندرويد: ","Android: ")+ar.notes):"",dr&&dr.notes?(L("سطح المكتب: ","Desktop: ")+dr.notes):""].filter(Boolean).join("\n\n");
+    const dn=$("#dln");
+    if(dn){
+      if(notes){dn.style.display="";dn.innerHTML=`<h2>${L("ما الجديد","What's new")}</h2><p class="small" style="white-space:pre-wrap;margin:0">${esc(notes.slice(0,1200))}</p>`}
+      else dn.style.display="none";
+    }
+  };
+  applyRelUI(false);
+  $("#dlchk").onclick=async()=>{
+    const b=$("#dlchk"),m=$("#dlchkMsg");
+    b.disabled=true;b.textContent=L("جاري الفحص…","Checking…");
+    await applyRelUI(true);
+    const upd=await checkAppUpdates({force:true,manual:true});
+    if(m){
+      if(upd&&upd.hasUpdate){
+        m.innerHTML=`<div class="stat ok" style="margin-top:10px">${esc(upd.title)} — ${esc(upd.body)}</div>`;
+      }else{
+        m.innerHTML=`<div class="stat ok" style="margin-top:10px">${L("جميع الروابط محدّثة لأحدث إصدار.","All download links point to the latest available release.")}</div>`;
+      }
+    }
+    b.disabled=false;b.textContent=L("فحص التحديثات الآن","Check for updates now");
+  };
+  dlGallery();
+}
 /* ===== offline downloads (app only) ===== */
 Object.assign(T.ar,{off:"التحميلات (بدون إنترنت)"});Object.assign(T.en,{off:"Downloads (offline)"});
 const OFF=(()=>{let dbp;const open=()=>dbp||(dbp=new Promise((res,rej)=>{const r=indexedDB.open("dw_offline",1);r.onupgradeneeded=()=>r.result.createObjectStore("f",{keyPath:"id"});r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}));
@@ -2269,7 +2554,7 @@ const mail=e=>`<a href="mailto:${e}" style="color:inherit;text-decoration:underl
 const PAST=["#fde7d9","#dfe9ff","#e1f3e8","#f5e3f4","#fff0cc","#e0f2f4"];
 function hdr(){if(!P)return;$("#wl").innerHTML=ic("card",18)+`<span>${P.wallet||0} ${t("egp")}</span>`;$("#av").textContent=((P.nameEn||P.nameAr||"?")[0]||"?").toUpperCase();const unreadN=getLNT().filter(n=>!n.read).length;$("#qa").innerHTML=[["wallet","card"],["subs","spark"],["tools","grid"],["sup","chat"],["notif","bell"]].map(x=>`<button data-q="${x[0]}">${ic(x[1],26)}<span>${t(x[0])}</span>${x[0]==="notif"&&unreadN?`<i class="qbad">${unreadN>99?"99+":unreadN}</i>`:""}</button>`).join("");$$("[data-q]").forEach(b=>b.onclick=()=>({wallet:vWallet,subs:vSubs,tools:vTools,sup:vSup,notif:vNotif})[b.dataset.q]());$("#wl").onclick=vWallet;$("#av").onclick=()=>nav("me")}
 let CQ="";
-function vCourses(){body.innerHTML=`<input class="srch" id="sq" placeholder="${t("search")}" value="${esc(CQ)}"><div class="dash" id="dsh"></div><button class="cor" id="gcard">${ic("users",26)}<span><b>${t("group")}</b><small>${L("دردشة الطلاب والفريق • القواعد • التقرير","Student & team chat • rules • report")}</small></span></button><div class="ttl">${t("myCourses")}</div><div id="cg"></div>`;dash();$("#sq").oninput=e=>{CQ=e.target.value;grid()};grid();$("#gcard").onclick=vGroup}
+function vCourses(){body.innerHTML=`<div id="updHost"></div><input class="srch" id="sq" placeholder="${t("search")}" value="${esc(CQ)}"><div class="dash" id="dsh"></div><button class="cor" id="gcard">${ic("users",26)}<span><b>${t("group")}</b><small>${L("دردشة الطلاب والفريق • القواعد • التقرير","Student & team chat • rules • report")}</small></span></button><div class="ttl">${t("myCourses")}</div><div id="cg"></div>`;mountUpdateBanner();dash();$("#sq").oninput=e=>{CQ=e.target.value;grid()};grid();$("#gcard").onclick=vGroup}
 function grid(){const q=CQ.trim().toLowerCase(),l=CS.filter(c=>((c.year===P.year&&c.term===P.term)||(P.extra||[]).includes(c.id))&&(!q||(c.title+" "+(c.titleEn||"")).toLowerCase().includes(q)));
 $("#cg").innerHTML=l.length?`<div class="grid">`+l.map((c,i)=>{const dt=window.DWCourseAlerts?window.DWCourseAlerts.buildCourseDetails(c,CT.lecs[c.id]||null,null,lang,CT.lec[c.id]):{instructor:c.instructor||"",lectureCountText:"",summary:c.summary||""};return`<button class="tile${su(c.cover)?" cv":""}" data-c="${esc(c.id)}" style="--p:${PAST[i%PAST.length]};${su(c.cover)?"background-image:url("+esc(cssUrl(c.cover))+")":""}"><b>${esc(lang==="ar"?c.title:c.titleEn||c.title)}</b><div class="tile-meta" data-cm="${esc(c.id)}"><span>${esc(dt.instructor)}</span><span>${esc(dt.lectureCountText)}</span></div><div class="tile-sum" data-cs="${esc(c.id)}">${esc(dt.summary)}</div><span class="tb">${ic("book",58)}</span><div class="cprog-foot"><div data-cp="${esc(c.id)}" style="width:100%">${cprogHTML(c)}</div><span class="tp">${c.price>0?esc(c.price)+" "+t("egp"):t("free")}${c.price>0&&!SUBS[c.id]?ic("lock",14):""}</span></div></button>`}).join("")+`</div>`:`<div class="empty">${t("noC")}</div>`;$$("[data-c]").forEach(b=>b.onclick=()=>vCourse(b.dataset.c));loadCourseTotals(l)}
 function payModal(item,amount,title){if(item==="vip")return vSubs();gw({item,title,amount,kind:"course"})}
@@ -2528,7 +2813,7 @@ async function renderCourseReviews(c,Tk,PR,lockedCourse){
 const pbar=Tk=>{const tot=Tk.length,dn=Tk.filter(k=>PR[k.id]&&PR[k.id].done).length,p=tot?Math.round(dn/tot*100):0;return`<div class="card" style="padding:14px"><div style="display:flex;justify-content:space-between;font-weight:700;font-size:14px"><span>${L("تقدمك في الدورة","Your progress")}</span><span>${dn} / ${tot} — ${p}%</span></div><div class="bar${p===100&&tot?" full":""}" role="progressbar" aria-valuenow="${p}" aria-valuemin="0" aria-valuemax="100"><i style="width:${p}%"></i></div></div>`};
 function cprogHTML(c){const locked=c.price>0&&!SUBS[c.id]&&P.role!=="admin";if(locked)return"";const tot=CT.tot[c.id]!==undefined?CT.tot[c.id]:c.taskCount;const doneSet=DS&&DS.byC&&DS.byC[c.id];const validIds=CT.ids[c.id];const dn=doneSet?(validIds?[...doneSet].filter(id=>validIds.has(id)).length:doneSet.size):0;if(tot===undefined){return`<div class="cprog" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"><div class="cprog-top"><span>${L("المنهج","Curriculum")}</span><span class="cprog-pct">…</span></div><div class="cbar"><i style="width:0%"></i></div></div>`}const d=Math.min(dn,tot),p=tot?Math.round(d/tot*100):0;return`<div class="cprog${p===100&&tot?" full":""}" role="progressbar" aria-valuenow="${p}" aria-valuemin="0" aria-valuemax="100"><div class="cprog-top"><span>${tot?`${d} / ${tot}`:L("لا توجد دروس","No lessons")}</span><span class="cprog-pct">${p}%</span></div><div class="cbar"><i style="width:${p}%"></i></div></div>`}
 function refreshGridProgress(courses){(courses||CS).forEach(c=>{const el=document.querySelector(`[data-cp="${CSS.escape(c.id)}"]`);if(el)el.innerHTML=cprogHTML(c);if(window.DWCourseAlerts){const dt=window.DWCourseAlerts.buildCourseDetails(c,CT.lecs[c.id]||null,null,lang,CT.lec[c.id]);const cm=document.querySelector(`[data-cm="${CSS.escape(c.id)}"]`),cs=document.querySelector(`[data-cs="${CSS.escape(c.id)}"]`);if(cm)cm.innerHTML=`<span>${esc(dt.instructor)}</span><span>${esc(dt.lectureCountText)}</span>`;if(cs)cs.textContent=dt.summary}})}
-async function loadCourseTotals(courses){const unlocked=courses.filter(c=>!(c.price>0&&!SUBS[c.id]&&P.role!=="admin"));if(!unlocked.length)return;const need=unlocked.filter(c=>!CT.at[c.id]||Date.now()-CT.at[c.id]>6e4);if(!need.length){refreshGridProgress(unlocked);return}await Promise.allSettled(need.map(async c=>{try{const[ts,ls_]=await Promise.all([db.collection("tasks").where("courseId","==",c.id).get(),db.collection("lectures").where("courseId","==",c.id).get()]);const so=(a,b)=>(a.order||0)-(b.order||0);const tList=ts.docs.map(d=>({id:d.id,...d.data()})).sort(so);const lList=ls_.docs.map(d=>({id:d.id,...d.data()})).sort(so);CT.tot[c.id]=tList.length;CT.ids[c.id]=new Set(tList.map(k=>k.id));CT.lec[c.id]=lList.length;CT.lecs[c.id]=lList;CT.tasks[c.id]=tList;CT.at[c.id]=Date.now()}catch(e){CT.tot[c.id]=CT.tot[c.id]??0;CT.at[c.id]=Date.now()}}));refreshGridProgress(unlocked);try{checkCourseAlerts()}catch(e){}try{syncStudentBadges({silent:true})}catch(e){}}
+async function loadCourseTotals(courses){const unlocked=courses.filter(c=>!(c.price>0&&!SUBS[c.id]&&P.role!=="admin"));if(!unlocked.length)return;const need=unlocked.filter(c=>!CT.at[c.id]||Date.now()-CT.at[c.id]>6e4);if(!need.length){refreshGridProgress(unlocked);try{renderProgressChartD3()}catch(e){}return}await Promise.allSettled(need.map(async c=>{try{const[ts,ls_]=await Promise.all([db.collection("tasks").where("courseId","==",c.id).get(),db.collection("lectures").where("courseId","==",c.id).get()]);const so=(a,b)=>(a.order||0)-(b.order||0);const tList=ts.docs.map(d=>({id:d.id,...d.data()})).sort(so);const lList=ls_.docs.map(d=>({id:d.id,...d.data()})).sort(so);CT.tot[c.id]=tList.length;CT.ids[c.id]=new Set(tList.map(k=>k.id));CT.lec[c.id]=lList.length;CT.lecs[c.id]=lList;CT.tasks[c.id]=tList;CT.at[c.id]=Date.now()}catch(e){CT.tot[c.id]=CT.tot[c.id]??0;CT.at[c.id]=Date.now()}}));refreshGridProgress(unlocked);try{renderProgressChartD3()}catch(e){}try{checkCourseAlerts()}catch(e){}try{syncStudentBadges({silent:true})}catch(e){}}
 /* ---------- local notifications + reminders ---------- */
 const lnKey=()=>"dw_lnotifs_"+(U?U.uid:"x");
 const seenLecKey=()=>"dw_seen_lec_"+(U?U.uid:"x");
@@ -2666,7 +2951,7 @@ sub(t("settings"),row(L("المظهر","Appearance"),`<div class="chips"><button
 +row(L("المدينة (مواقيت الصلاة والطقس والويدجت)","City (prayer times, weather, widget)"),`<select class="fi" id="ct_">${CITIES.map(c=>`<option value="${c[0]}" ${CITY()[0]===c[0]?"selected":""}>${esc(lang==="ar"?c[1]:c[2])}</option>`).join("")}</select>`)
 +(NAT?row(L("أيقونة التطبيق","App icon")+(pro?"":" — Pro"),`<div class="icg">${ICONS.map(x=>`<button class="icb ${(S.icon||"Default")===x[0]?"on":""}" data-ic_="${x[0]}"><img src="${x[3]}" alt=""><span>${esc(lang==="ar"?x[1]:x[2])}</span></button>`).join("")}</div>`)+row(L("ثيم الويدجت","Widget theme")+(pro?"":" — Pro"),`<div class="chips">${THEMES.filter(x=>x[0]!=="dark").map(x=>`<button class="chip ${(S.wt||"navy")===x[0]?"on":""}" data-wt="${x[0]}">${esc(lang==="ar"?x[1]:x[2])}</button>`).join("")}</div>`):"")
 +row(L("الأمان","Security"),`<p class="small" style="margin:0">${(NAT&&!DESK)?L("القفل بالبصمة أو الوجه إجباري ومفعّل، ويُطلب عند كل عملية دفع. التطبيق يمنع لقطة الشاشة.","Fingerprint/face lock is on and required for every payment. Screenshots are blocked."):DESK?L("رمز PIN مفعّل لحماية حسابك. التطبيق يمنع لقطة الشاشة.","PIN lock protects your account. Screenshots are blocked."):L("رمز PIN مفعّل لحماية حسابك. لحماية أقوى استخدم تطبيق الأندرويد.","PIN lock protects your account. Use the Android app for stronger protection.")}</p>${(NAT&&!DESK)?"":`<button class="btn ghost" id="lkb" style="margin-top:8px">${t("lockH")}</button>`}`)
-+row(L("عن التطبيق","About"),`<p class="small" style="margin:0">${L("الإصدار","Version")}: ${esc(VER||"web")}</p><button class="btn ghost" id="tmb" style="margin-top:8px">${t("terms")}</button><button class="btn ghost" id="spb" style="margin-top:8px">${t("sup")}</button>`));
++row(L("عن التطبيق والتحديثات","About & updates"),`<p class="small" style="margin:0;font-variant-numeric:tabular-nums">${L("الإصدار الحالي","Current version")}: ${esc(VER?VER+" (Desktop)":APP_WEB_VER+" (Web)")}</p><button class="btn gold" id="updb" style="margin-top:8px">${L("التحقق من التحديثات","Check for updates")}</button><div id="upds"></div><button class="btn ghost" id="dlb2" style="margin-top:8px">${L("صفحة التحميل وإصدارات التطبيق","Downloads & app releases")}</button><button class="btn ghost" id="tmb" style="margin-top:8px">${t("terms")}</button><button class="btn ghost" id="spb" style="margin-top:8px">${t("sup")}</button>`));
 const needPro=()=>{toast(L("هذه الميزة لمشتركي برو","This feature is for Pro subscribers"));vSubs()};
 $$("[data-lg]").forEach(b=>b.onclick=()=>{lang=b.dataset.lg;ls.set("dw_lang",lang);applyLang();vSettings()});
 $$(".thb").forEach(b=>b.onclick=()=>{const x=THEMES.find(z=>z[0]===b.dataset.th);if(x[3]&&!pro)return needPro();setS("theme",x[0]);applyTheme(x[0]);vSettings()});
@@ -2677,6 +2962,20 @@ $("#alLec").onchange=()=>{setS("alertLec",$("#alLec").checked);if($("#alLec").ch
 $("#ct_").onchange=e=>{setS("city",e.target.value);sendPrefs()};
 $$("[data-ic_]").forEach(b=>b.onclick=()=>{if(!pro)return needPro();setS("icon",b.dataset.ic_);nreq("icon",{name:b.dataset.ic_});vSettings()});
 $$("[data-wt]").forEach(b=>b.onclick=()=>{if(b.dataset.wt!=="navy"&&!pro)return needPro();setS("wt",b.dataset.wt);sendPrefs();vSettings()});
+$("#updb").onclick=async()=>{
+  const b=$("#updb"),stEl=$("#upds");b.disabled=true;
+  if(stEl)stEl.innerHTML=`<div class="small" style="margin-top:6px">${L("جاري التحقق من التحديثات…","Checking for updates…")}</div>`;
+  const upd=await checkAppUpdates({force:true,manual:true});
+  if(stEl){
+    if(upd&&upd.hasUpdate){
+      stEl.innerHTML=`<div class="stat ok" style="margin-top:8px">${esc(upd.title)} — ${esc(upd.body)}</div>`;
+    }else{
+      stEl.innerHTML=`<div class="stat ok" style="margin-top:8px">${L("أنت على أحدث إصدار متاح.","You are on the latest available version.")}</div>`;
+    }
+  }
+  b.disabled=false;
+};
+$("#dlb2").onclick=showDl;
 if($("#lkb"))$("#lkb").onclick=vLock;$("#tmb").onclick=showTerms;$("#spb").onclick=vSup}
 function sendPrefs(){const c=CITY(),S=SET();nreq("prefs",{city:c[0],wt:(S.wt&&(VIP()||P.role==="admin"))?S.wt:"navy"})}
 /* ---------- student tools (public APIs) ---------- */
@@ -2908,18 +3207,274 @@ async function hydrateBadgesForProfile(){
     syncStudentBadges({silent:true});
   }catch(e){}
 }
+let _chartMode="courses",_chartSelId="";
+function renderProgressChartD3(){
+  const card=$("#dshChart");if(!card)return;
+  const pc=window.DWProgressChart;if(!pc)return;
+  const mineCourses=CS.filter(c=>((c.year===P.year&&c.term===P.term)||(P.extra||[]).includes(c.id))&&!(c.price>0&&!SUBS[c.id]&&P.role!=="admin"));
+  const data=pc.buildStudentProgressData({
+    lang:lang||"ar",
+    courses:mineCourses,
+    doneByCourse:DS&&DS.byC?DS.byC:{},
+    validTaskIdsByCourse:CT.ids||{},
+    totalTasksByCourse:CT.tot||{},
+    daysMap:DS&&DS.days?DS.days:{},
+    now:Date.now()
+  });
+  const isCourses=_chartMode==="courses";
+  const summaryTxt=isCourses
+    ?`${L("الإنجاز الكلي","Overall")}: ${data.overallPercent}% · ${data.totalDone} / ${data.totalTasks} ${L("مهمة","tasks")} · ${data.completedCourses} / ${data.enrolledCount} ${L("دورات مكتملة","completed")}`
+    :`${L("مهام منجزة في 7 أيام","Tasks completed (7 days)")}: ${data.weeklyTotal}`;
+
+  card.innerHTML=`<div class="dsh-chart-hd">
+    <div>
+      <h2 class="dsh-chart-ttl">${L("مؤشر التقدم ومعدلات إتمام الدورات","Progress & Course Completion Chart")}</h2>
+      <div class="dsh-chart-meta">${esc(summaryTxt)}</div>
+    </div>
+    <div class="dsh-seg" role="tablist" aria-label="${esc(L("نوع الرسم البياني","Chart view"))}">
+      <button type="button" data-cmode="courses" aria-pressed="${isCourses?"true":"false"}">${L("إتمام الدورات","Courses %")}</button>
+      <button type="button" data-cmode="weekly" aria-pressed="${!isCourses?"true":"false"}">${L("النشاط اليومي","7-Day Tasks")}</button>
+    </div>
+  </div>
+  <div class="dsh-svg-wrap" id="dshD3Wrap"></div>
+  <div id="dshD3Tip" class="dsh-tip" style="display:none"></div>`;
+
+  card.querySelectorAll("[data-cmode]").forEach(btn=>btn.onclick=()=>{
+    _chartMode=btn.dataset.cmode;
+    renderProgressChartD3();
+  });
+
+  const wrap=$("#dshD3Wrap"),tip=$("#dshD3Tip");
+  if(!wrap)return;
+  if(isCourses&&!data.courseItems.length){
+    wrap.innerHTML=`<div class="dsh-empty">${L("لا توجد دورات مفتوحة حاليًا لعرض الرسم البياني لها.","No unlocked courses yet to chart.")}</div>`;
+    return;
+  }
+
+  const cs=getComputedStyle(document.documentElement);
+  const ink=(cs.getPropertyValue("--ink")||"#101426").trim();
+  const mute=(cs.getPropertyValue("--mute")||"#6e7390").trim();
+  const lineCol=(cs.getPropertyValue("--line")||"#e6e8f2").trim();
+  const trackCol=(cs.getPropertyValue("--g2")||"#eceef6").trim();
+  const navyCol=(cs.getPropertyValue("--navy")||"#B22127").trim();
+  const goldCol=(cs.getPropertyValue("--gold")||"#f5a83a").trim();
+  const okCol=(cs.getPropertyValue("--ok")||"#1b7a54").trim();
+
+  const updateTipCourse=(item)=>{
+    if(!tip||!item)return;
+    tip.style.display="flex";
+    tip.innerHTML=`<div><b>${esc(item.title)}</b> <small>· ${item.doneTasks} / ${item.totalTasks} ${L("مهمة","tasks")} · ${item.percent}% (${esc(item.statusLabel)})</small></div>
+      <button type="button" class="dsh-tip-btn" data-open-cid="${esc(item.id)}">${L("فتح الدورة","Open course")}</button>`;
+    const ob=tip.querySelector("[data-open-cid]");
+    if(ob)ob.onclick=()=>vCourse(ob.dataset.openCid);
+  };
+  const updateTipDay=(day)=>{
+    if(!tip||!day)return;
+    tip.style.display="flex";
+    tip.innerHTML=`<div><b>${esc(day.fullDate)} (${esc(day.label)})</b> <small>· ${day.count} ${L("مهمة مكتملة","tasks completed")}</small></div>`;
+  };
+
+  if(!window.d3){
+    wrap.innerHTML=isCourses
+      ?data.courseItems.map(item=>`<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:12.5px;font-weight:700"><span>${esc(item.title)}</span><span>${item.percent}% (${item.doneTasks}/${item.totalTasks})</span></div><div class="cbar"><i style="width:${item.percent}%"></i></div></div>`).join("")
+      :`<div class="wkb">${data.weekly.map(d=>`<div><i style="height:${Math.max(6,d.count/data.weeklyMax*48)}px"></i><small>${esc(d.label)}</small></div>`).join("")}</div>`;
+    return;
+  }
+
+  const d3=window.d3;
+  const W=540;
+  if(isCourses){
+    const items=data.courseItems;
+    const rowH=42,mTop=10,mBot=28,mLeft=150,mRight=78;
+    const innerW=W-mLeft-mRight,innerH=Math.max(76,items.length*rowH);
+    const H=innerH+mTop+mBot;
+
+    const svg=d3.select(wrap)
+      .append("svg")
+      .attr("viewBox",`0 0 ${W} ${H}`)
+      .attr("dir","ltr")
+      .attr("role","img")
+      .attr("aria-label",L("معدل إتمام الدورات","Course completion rates"));
+
+    const defs=svg.append("defs");
+    const grad=defs.append("linearGradient").attr("id","dwBarGrad").attr("x1","0%").attr("x2","100%");
+    grad.append("stop").attr("offset","0%").attr("stop-color",navyCol);
+    grad.append("stop").attr("offset","100%").attr("stop-color",goldCol);
+
+    const g=svg.append("g").attr("transform",`translate(${mLeft},${mTop})`);
+    const x=d3.scaleLinear().domain([0,100]).range([0,innerW]);
+    const y=d3.scaleBand().domain(items.map(d=>d.id)).range([0,innerH]).padding(0.32);
+
+    g.append("g")
+      .attr("class","dsh-grid")
+      .attr("transform",`translate(0,${innerH})`)
+      .call(d3.axisBottom(x).ticks(5).tickSize(-innerH).tickFormat(()=>""))
+      .call(s=>{s.select(".domain").remove();s.selectAll("line").attr("stroke",lineCol).attr("stroke-dasharray","3,3")});
+
+    g.append("g")
+      .attr("transform",`translate(0,${innerH})`)
+      .call(d3.axisBottom(x).ticks(5).tickFormat(d=>d+"%"))
+      .call(s=>{
+        s.select(".domain").attr("stroke",lineCol);
+        s.selectAll("line").attr("stroke",lineCol);
+        s.selectAll("text").attr("fill",mute).style("font-size","11px").style("font-weight","600");
+      });
+
+    g.append("g")
+      .call(d3.axisLeft(y).tickSize(0).tickFormat(id=>{
+        const f=items.find(it=>it.id===id);
+        return f?f.shortTitle:id;
+      }))
+      .call(s=>{
+        s.select(".domain").remove();
+        s.selectAll("text")
+          .attr("fill",ink)
+          .attr("dx","-8")
+          .attr("dir","auto")
+          .style("font-size","12px")
+          .style("font-weight","700");
+      });
+
+    const rows=g.selectAll(".dsh-bar-row")
+      .data(items,d=>d.id)
+      .enter()
+      .append("g")
+      .attr("class","dsh-bar-row")
+      .attr("tabindex","0")
+      .on("mouseenter",(_ev,d)=>updateTipCourse(d))
+      .on("click",(_ev,d)=>{_chartSelId=d.id;updateTipCourse(d)})
+      .on("focus",(_ev,d)=>updateTipCourse(d));
+
+    rows.append("rect")
+      .attr("x",0)
+      .attr("y",d=>y(d.id))
+      .attr("width",innerW)
+      .attr("height",y.bandwidth())
+      .attr("rx",6)
+      .attr("fill",trackCol);
+
+    const bars=rows.append("rect")
+      .attr("x",0)
+      .attr("y",d=>y(d.id))
+      .attr("width",0)
+      .attr("height",y.bandwidth())
+      .attr("rx",6)
+      .attr("fill",d=>d.status==="completed"?okCol:(d.percent>0?"url(#dwBarGrad)":mute));
+
+    bars.transition()
+      .duration(320)
+      .attr("width",d=>d.percent>0?Math.max(8,x(d.percent)):0);
+
+    rows.append("text")
+      .attr("x",innerW+8)
+      .attr("y",d=>y(d.id)+y.bandwidth()/2)
+      .attr("dy","0.35em")
+      .attr("fill",d=>d.status==="completed"?okCol:ink)
+      .style("font-size","11.5px")
+      .style("font-weight","700")
+      .style("font-variant-numeric","tabular-nums")
+      .text(d=>`${d.percent}% (${d.doneTasks}/${d.totalTasks})`);
+
+    const initItem=(_chartSelId&&items.find(i=>i.id===_chartSelId))||items[0];
+    if(initItem)updateTipCourse(initItem);
+  }else{
+    const days=data.weekly;
+    const mTop=18,mBot=28,mLeft=38,mRight=14,H=195;
+    const innerW=W-mLeft-mRight,innerH=H-mTop-mBot;
+
+    const svg=d3.select(wrap)
+      .append("svg")
+      .attr("viewBox",`0 0 ${W} ${H}`)
+      .attr("dir","ltr")
+      .attr("role","img")
+      .attr("aria-label",L("النشاط اليومي خلال 7 أيام","7-day task completion activity"));
+
+    const defs=svg.append("defs");
+    const grad=defs.append("linearGradient").attr("id","dwWkGrad").attr("x1","0%").attr("y1","100%").attr("x2","0%").attr("y2","0%");
+    grad.append("stop").attr("offset","0%").attr("stop-color",navyCol);
+    grad.append("stop").attr("offset","100%").attr("stop-color",goldCol);
+
+    const g=svg.append("g").attr("transform",`translate(${mLeft},${mTop})`);
+    const x=d3.scaleBand().domain(days.map(d=>String(d.index))).range([0,innerW]).padding(0.35);
+    const yMax=Math.max(2,d3.max(days,d=>d.count)||0);
+    const y=d3.scaleLinear().domain([0,yMax]).nice().range([innerH,0]);
+
+    g.append("g")
+      .call(d3.axisLeft(y).ticks(Math.min(4,yMax)).tickSize(-innerW).tickFormat(d3.format("d")))
+      .call(s=>{
+        s.select(".domain").remove();
+        s.selectAll("line").attr("stroke",lineCol).attr("stroke-dasharray","3,3");
+        s.selectAll("text").attr("fill",mute).style("font-size","11px");
+      });
+
+    g.append("g")
+      .attr("transform",`translate(0,${innerH})`)
+      .call(d3.axisBottom(x).tickFormat(idx=>{
+        const f=days.find(d=>String(d.index)===idx);
+        return f?f.label:idx;
+      }))
+      .call(s=>{
+        s.select(".domain").attr("stroke",lineCol);
+        s.selectAll("line").attr("stroke",lineCol);
+        s.selectAll("text").attr("fill",ink).style("font-size","11.5px").style("font-weight","700");
+      });
+
+    const cols=g.selectAll(".dsh-bar-row")
+      .data(days,d=>d.index)
+      .enter()
+      .append("g")
+      .attr("class","dsh-bar-row")
+      .attr("tabindex","0")
+      .on("mouseenter",(_ev,d)=>updateTipDay(d))
+      .on("click",(_ev,d)=>updateTipDay(d))
+      .on("focus",(_ev,d)=>updateTipDay(d));
+
+    cols.append("rect")
+      .attr("x",d=>x(String(d.index)))
+      .attr("y",0)
+      .attr("width",x.bandwidth())
+      .attr("height",innerH)
+      .attr("rx",6)
+      .attr("fill",trackCol)
+      .attr("opacity",.55);
+
+    cols.append("rect")
+      .attr("x",d=>x(String(d.index)))
+      .attr("y",innerH)
+      .attr("width",x.bandwidth())
+      .attr("height",0)
+      .attr("rx",6)
+      .attr("fill","url(#dwWkGrad)")
+      .transition()
+      .duration(300)
+      .attr("y",d=>d.count>0?y(d.count):innerH-4)
+      .attr("height",d=>d.count>0?Math.max(6,innerH-y(d.count)):4);
+
+    cols.append("text")
+      .attr("x",d=>x(String(d.index))+x.bandwidth()/2)
+      .attr("y",d=>d.count>0?y(d.count)-5:innerH-8)
+      .attr("text-anchor","middle")
+      .attr("fill",ink)
+      .style("font-size","11px")
+      .style("font-weight","700")
+      .style("font-variant-numeric","tabular-nums")
+      .text(d=>d.count>0?String(d.count):"");
+
+    updateTipDay(days[days.length-1]);
+  }
+}
 async function dash(){const e0=$("#dsh");const mine=CS.filter(c=>(c.year===P.year&&c.term===P.term)||(P.extra||[]).includes(c.id)).length;
 await loadProgressDS();
 refreshGridProgress();
 try{syncStudentBadges({silent:true})}catch(ex){}
 const e=$("#dsh");if(!e)return;let st=0;for(let i=0;i<400;i++){const d=new Date(Date.now()-i*864e5).toDateString();if(DS.days[d]||(i===0&&false))st++;else if(i>0)break;else continue}
 const study=JSON.parse(ls.get("dw_study")||"{}"),today=study[new Date().toDateString()]||0;
-const wk=[...Array(7)].map((_,i)=>{const d=new Date(Date.now()-(6-i)*864e5);return{n:DS.days[d.toDateString()]||0,l:d.toLocaleDateString(lang==="ar"?"ar-EG":"en-GB",{weekday:"narrow"})}}),mx=Math.max(1,...wk.map(x=>x.n));
-e.innerHTML=[[t("dCourses"),mine],[t("dDone"),DS.n],[L("أيام متتالية","Day streak"),st],[L("دقائق اليوم","Min today"),today]].map(x=>`<div class="dc"><b>${esc(x[1])}</b><small>${esc(x[0])}</small></div>`).join("")+`<div class="dc wk" style="grid-column:1/-1"><small>${L("نشاط آخر 7 أيام","Last 7 days")}</small><div class="wkb">${wk.map(x=>`<div><i style="height:${Math.max(6,x.n/mx*48)}px"></i><small>${esc(x.l)}</small></div>`).join("")}</div></div>`}
+e.innerHTML=[[t("dCourses"),mine],[t("dDone"),DS.n],[L("أيام متتالية","Day streak"),st],[L("دقائق اليوم","Min today"),today]].map(x=>`<div class="dc"><b>${esc(x[1])}</b><small>${esc(x[0])}</small></div>`).join("")+`<section class="dsh-chart-card" id="dshChart" aria-label="${esc(L("رسم بياني لتقدم الطالب","Student progress chart"))}"></section>`;
+renderProgressChartD3()}
 
 const cssUrl=u=>su(u).replace(/['"()\\\s]/g,c=>"%"+c.charCodeAt(0).toString(16));
 let _pb=false;
-function postBoot(){if(_pb)return;_pb=true;ensureMember();const th=SET().theme||"navy",x=THEMES.find(z=>z[0]===th);if(x&&x[3]&&!VIP()&&P.role!=="admin"){setS("theme","navy");applyTheme("navy")}sendPrefs();schedDaily();startCourseAlertWatch();_alTimer=setInterval(remTick,20000);try{syncStudentBadges({silent:true})}catch(e){}}
+function postBoot(){if(_pb)return;_pb=true;ensureMember();const th=SET().theme||"navy",x=THEMES.find(z=>z[0]===th);if(x&&x[3]&&!VIP()&&P.role!=="admin"){setS("theme","navy");applyTheme("navy")}sendPrefs();schedDaily();startCourseAlertWatch();_alTimer=setInterval(remTick,20000);try{syncStudentBadges({silent:true})}catch(e){}setTimeout(()=>{checkAppUpdates().catch(()=>{})},1200)}
 
 /* ===== part5: AI chat (local first, optional 3-month cloud for Pro) ===== */
 const aiKey=()=>"dw_ai_"+(U?U.uid:"x");

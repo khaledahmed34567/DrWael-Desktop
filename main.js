@@ -44,7 +44,8 @@ const PREFETCH = [
   KATEX + 'contrib/mhchem.min.js',
   KATEX + 'contrib/auto-render.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js'
 ];
 const libAllowed = (u) => u.protocol === 'https:' && LIB_HOSTS.some(([h, p]) => u.hostname === h && u.pathname.startsWith(p));
 const sha1 = (s) => crypto.createHash('sha1').update(s).digest('hex');
@@ -138,6 +139,7 @@ var h=window.__dwHost;if(!h)return;
 window.DWNative={desktop:true,platform:${JSON.stringify(process.platform)},postMessage:function(s){h.send(String(s))},onmessage:null};
 h.onReply(function(m){try{if(window.DWNative.onmessage)window.DWNative.onmessage({data:m})}catch(e){}});
 if(h.onShield){h.onShield(function(on){try{window.dispatchEvent(new CustomEvent('dw-shield',{detail:!!on}))}catch(e){}});}
+if(h.onUpdate){h.onUpdate(function(info){try{window.dispatchEvent(new CustomEvent('dw-update',{detail:info}))}catch(e){}});}
 var D=function(k,m,d){try{var r=h.dialog(k,m==null?'':String(m),d==null?'':String(d),document.documentElement.lang||'ar',document.documentElement.dir!=='ltr');return r===undefined?null:r}catch(e){return null}};
 window.alert=function(m){D('alert',m)};
 window.confirm=function(m){return D('confirm',m)===true};
@@ -173,6 +175,21 @@ function startServer() {
         if (req.method === 'GET' && u.pathname === '/course-features.js') {
           res.writeHead(200, { 'content-type': 'application/javascript; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' });
           return res.end(fs.readFileSync(path.join(__dirname, 'app', 'course-features.js'), 'utf8'));
+        }
+        if (req.method === 'GET' && u.pathname === '/student-badges.js') {
+          res.writeHead(200, { 'content-type': 'application/javascript; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' });
+          return res.end(fs.readFileSync(path.join(__dirname, 'app', 'student-badges.js'), 'utf8'));
+        }
+        if (req.method === 'GET' && u.pathname === '/progress-chart.js') {
+          res.writeHead(200, { 'content-type': 'application/javascript; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' });
+          return res.end(fs.readFileSync(path.join(__dirname, 'app', 'progress-chart.js'), 'utf8'));
+        }
+        if (req.method === 'GET' && u.pathname === '/d3.min.js') {
+          const d3p = path.join(__dirname, 'node_modules', 'd3', 'dist', 'd3.min.js');
+          if (fs.existsSync(d3p)) {
+            res.writeHead(200, { 'content-type': 'application/javascript; charset=utf-8', 'cache-control': 'public, max-age=86400', 'x-content-type-options': 'nosniff' });
+            return res.end(fs.readFileSync(d3p, 'utf8'));
+          }
         }
         if (req.method === 'GET' && u.pathname === '/__lib') {
           let t;
@@ -474,7 +491,15 @@ function checkUpdates(manual) {
     if (!autoUpdater) {
       ({ autoUpdater } = require('electron-updater'));
       autoUpdater.autoDownload = true;
+      autoUpdater.on('update-available', (info) => {
+        if (win && !win.isDestroyed()) {
+          try { win.webContents.send('dw:update', { status: 'available', version: info && info.version ? String(info.version) : '' }); } catch (e) { /* تجاهل */ }
+        }
+      });
       autoUpdater.on('update-downloaded', (info) => {
+        if (win && !win.isDestroyed()) {
+          try { win.webContents.send('dw:update', { status: 'downloaded', version: info && info.version ? String(info.version) : '' }); } catch (e) { /* تجاهل */ }
+        }
         brandDialog({
           k: 'confirm', l: 'ar', rtl: true,
           m: 'تحديث جديد (الإصدار ' + info.version + ') جاهز. هل تريد إعادة التشغيل الآن لتثبيته؟',
