@@ -29,13 +29,28 @@
       "buildResources": "build",
       "output": "dist"
     },
-    "files": ["main.js", "preload.js", "bridge.js", "dialog.html", "dialog-preload.js", "config.json", "app/**", "assets/**", "build/**", "package.json"],
+    "files": [
+      "main.js",
+      "preload.js",
+      "bridge.js",
+      "dialog.html",
+      "dialog-preload.js",
+      "config.json",
+      "app/**",
+      "assets/**",
+      "build/**",
+      "package.json"
+    ],
     "win": {
-      "target": [{
-        "target": "nsis",
-        "arch": ["x64"]
-      }],
-      "icon": "build/icon.png",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico",
       "artifactName": "DrWael-Setup.${ext}"
     },
     "nsis": {
@@ -48,33 +63,47 @@
       "installerSidebar": "build/side_banner.bmp",
       "uninstallerSidebar": "build/side_banner.bmp",
       "installerHeader": "build/header_logo.bmp",
-      "include": "build/installer.nsh"
+      "include": "build/installer.nsh",
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico"
     },
     "mac": {
-      "target": [{
-        "target": "dmg",
-        "arch": ["universal"]
-      }, {
-        "target": "zip",
-        "arch": ["universal"]
-      }],
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "universal"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "universal"
+          ]
+        }
+      ],
       "icon": "build/icon.png",
       "category": "public.app-category.education",
       "artifactName": "DrWael-mac.${ext}"
     },
     "linux": {
-      "target": ["AppImage", "deb"],
+      "target": [
+        "AppImage",
+        "deb"
+      ],
       "icon": "build/icon.png",
       "executableName": "drwael-desktop",
       "category": "Education",
       "maintainer": "Dr. Wael <info@drwael.app>",
       "artifactName": "DrWael-linux.${ext}"
     },
-    "publish": [{
-      "provider": "github",
-      "owner": "khaledahmed34567",
-      "repo": "DrWael-Desktop",
-      "releaseType": "release"
-    }]
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "khaledahmed34567",
+        "repo": "DrWael-Desktop",
+        "releaseType": "release"
+      }
+    ]
   }
 }
