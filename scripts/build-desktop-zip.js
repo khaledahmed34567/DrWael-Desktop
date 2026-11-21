@@ -17,7 +17,7 @@ const DESKTOP_ENTRIES = [
   'README.md',
   '.gitignore',
   '.github/workflows/build.yml',
-  'build/icon.png',
+  'build',
   'assets',
   'app',
   'scripts',
@@ -152,8 +152,8 @@ function createZipBuffer(files) {
 function buildDesktopZip(options) {
   const rootDir = (options && options.rootDir) || ROOT;
   const files = collectFiles(rootDir);
-  if (!files.some((f) => f.relPath === 'package.json') || !files.some((f) => f.relPath === 'build/icon.png')) {
-    throw new Error('Required desktop project files (package.json, build/icon.png) are missing');
+  if (!files.some((f) => f.relPath === 'package.json') || !files.some((f) => f.relPath === 'build/icon.png') || !files.some((f) => f.relPath === 'build/installer.nsh')) {
+    throw new Error('Required desktop project files (package.json, build/icon.png, build/installer.nsh) are missing');
   }
   return {
     buffer: createZipBuffer(files),

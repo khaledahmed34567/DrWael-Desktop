@@ -73,13 +73,52 @@ test('server security helpers validate owner key and strip GitHub URLs from rele
   assert.equal(Object.keys(FALLBACK_TARGETS).length, 6);
 });
 
-test('buildDesktopZip packages updated Desktop repo files and icons without HTML export or owner key', () => {
+test('buildDesktopZip packages updated Desktop repo files, NSIS graphics/script, and icons without HTML export or owner key', () => {
   const fs = require('node:fs');
   const path = require('node:path');
   const { buildDesktopZip } = require('../scripts/build-desktop-zip');
 
-  const iconPath = path.join(__dirname, '..', 'build', 'icon.png');
+  const rootDir = path.join(__dirname, '..');
+  const iconPath = path.join(rootDir, 'build', 'icon.png');
+  const sideBannerPath = path.join(rootDir, 'build', 'side_banner.bmp');
+  const headerLogoPath = path.join(rootDir, 'build', 'header_logo.bmp');
+  const installerNshPath = path.join(rootDir, 'build', 'installer.nsh');
+
   assert.equal(fs.existsSync(iconPath), true, 'build/icon.png must exist for Electron desktop builds');
+  assert.equal(fs.existsSync(sideBannerPath), true, 'build/side_banner.bmp must exist for NSIS installer');
+  assert.equal(fs.existsSync(headerLogoPath), true, 'build/header_logo.bmp must exist for NSIS installer');
+  assert.equal(fs.existsSync(installerNshPath), true, 'build/installer.nsh must exist for NSIS installer');
+
+  const sideBuf = fs.readFileSync(sideBannerPath);
+  assert.equal(sideBuf.toString('ascii', 0, 2), 'BM', 'side_banner.bmp must have BMP signature');
+  assert.equal(sideBuf.readUInt32LE(10), 54, 'side_banner.bmp must use classic 40-byte BITMAPINFOHEADER (offset 54)');
+  assert.equal(sideBuf.readInt32LE(18), 164, 'side_banner.bmp width must be 164px');
+  assert.equal(sideBuf.readInt32LE(22), 314, 'side_banner.bmp height must be 314px');
+  assert.equal(sideBuf.readUInt16LE(28), 24, 'side_banner.bmp must be 24-bit RGB');
+
+  const headerBuf = fs.readFileSync(headerLogoPath);
+  assert.equal(headerBuf.toString('ascii', 0, 2), 'BM', 'header_logo.bmp must have BMP signature');
+  assert.equal(headerBuf.readUInt32LE(10), 54, 'header_logo.bmp must use classic 40-byte BITMAPINFOHEADER (offset 54)');
+  assert.equal(headerBuf.readInt32LE(18), 150, 'header_logo.bmp width must be 150px');
+  assert.equal(headerBuf.readInt32LE(22), 57, 'header_logo.bmp height must be 57px');
+  assert.equal(headerBuf.readUInt16LE(28), 24, 'header_logo.bmp must be 24-bit RGB');
+
+  const nshText = fs.readFileSync(installerNshPath, 'utf8');
+  for (const macro of [
+    'MUI_WELCOMEFINISHPAGE_BITMAP',
+    'MUI_UNWELCOMEFINISHPAGE_BITMAP',
+    'MUI_HEADERIMAGE',
+    'MUI_HEADERIMAGE_BITMAP',
+    'MUI_HEADERIMAGE_RIGHT'
+  ]) {
+    assert.ok(nshText.includes(macro), `Expected ${macro} in build/installer.nsh`);
+  }
+
+  const pkg = JSON.parse(fs.readFileSync(path.join(rootDir, 'package.json'), 'utf8'));
+  assert.equal(pkg.build.nsis.installerSidebar, 'build/side_banner.bmp');
+  assert.equal(pkg.build.nsis.uninstallerSidebar, 'build/side_banner.bmp');
+  assert.equal(pkg.build.nsis.installerHeader, 'build/header_logo.bmp');
+  assert.equal(pkg.build.nsis.include, 'build/installer.nsh');
 
   const { buffer, files } = buildDesktopZip();
   assert.ok(buffer.length > 100000, 'Expected non-empty desktop zip archive');
@@ -95,6 +134,9 @@ test('buildDesktopZip packages updated Desktop repo files and icons without HTML
     'config.json',
     '.github/workflows/build.yml',
     'build/icon.png',
+    'build/side_banner.bmp',
+    'build/header_logo.bmp',
+    'build/installer.nsh',
     'assets/icons/Default.png',
     'app/index.html',
     'app/course-alerts.js',
@@ -109,7 +151,7 @@ test('buildDesktopZip packages updated Desktop repo files and icons without HTML
     assert.equal(files.includes(forbidden), false, `Must exclude ${forbidden} from desktop repo zip`);
   }
 
-  const indexHtml = fs.readFileSync(path.join(__dirname, '..', 'app', 'index.html'), 'utf8');
+  const indexHtml = fs.readFileSync(path.join(rootDir, 'app', 'index.html'), 'utf8');
   assert.ok(indexHtml.includes('.wrap{width:100%;max-width:none;margin:0;'), 'Expected full-width .wrap rule in app/index.html');
   assert.ok(indexHtml.includes('.dlb{width:100%;max-width:none;margin:0;'), 'Expected full-width .dlb rule in app/index.html');
   assert.equal(indexHtml.includes('/download/desktop-zip'), false, 'Student UI must never expose /download/desktop-zip');

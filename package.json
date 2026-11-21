@@ -44,7 +44,11 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Dr. Wael"
+      "shortcutName": "Dr. Wael",
+      "installerSidebar": "build/side_banner.bmp",
+      "uninstallerSidebar": "build/side_banner.bmp",
+      "installerHeader": "build/header_logo.bmp",
+      "include": "build/installer.nsh"
     },
     "mac": {
       "target": [{
