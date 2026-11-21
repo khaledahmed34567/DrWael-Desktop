@@ -6,6 +6,7 @@ const https = require('https');
 const path = require('path');
 const { URL } = require('url');
 const { buildStandaloneHtml } = require('./scripts/build-html');
+const { buildDesktopZip } = require('./scripts/build-desktop-zip');
 const { normalizeReleaseInfo } = require('./app/progress-chart');
 
 const app = express();
@@ -413,6 +414,31 @@ app.get('/download/html', (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   res.setHeader('Content-Type', 'application/octet-stream');
   res.setHeader('Content-Disposition', 'attachment; filename="DrWael.html"');
+  res.setHeader('X-Download-Options', 'noopen');
+  res.send(buf);
+});
+
+app.get('/download/desktop-zip', (req, res) => {
+  const provided = req.query && typeof req.query.key === 'string' ? req.query.key : '';
+  if (!isValidOwnerKey(provided, OWNER_HTML_KEY)) {
+    res.status(404).type('text/plain').send('Not Found');
+    return;
+  }
+
+  let buf;
+  try {
+    buf = buildDesktopZip().buffer;
+  } catch (_) {
+    const zipPath = path.join(__dirname, 'DrWael-Desktop-Project.zip');
+    if (!fs.existsSync(zipPath)) {
+      res.status(500).type('text/plain').send('Desktop package unavailable');
+      return;
+    }
+    buf = fs.readFileSync(zipPath);
+  }
+  res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('Content-Type', 'application/zip');
+  res.setHeader('Content-Disposition', 'attachment; filename="DrWael-Desktop-Project.zip"');
   res.setHeader('X-Download-Options', 'noopen');
   res.send(buf);
 });

@@ -204,7 +204,26 @@ function startServer() {
           });
           return fs.createReadStream(f).pipe(res);
         }
-        if (u.pathname === '/favicon.ico') { res.writeHead(204); return res.end(); }
+        if (req.method === 'GET' && u.pathname.startsWith('/assets/')) {
+          const assetsRoot = path.join(__dirname, 'assets');
+          const relPath = decodeURIComponent(u.pathname.slice('/assets/'.length));
+          const resolved = path.resolve(assetsRoot, relPath);
+          if ((resolved === assetsRoot || resolved.startsWith(assetsRoot + path.sep)) && fs.existsSync(resolved) && fs.statSync(resolved).isFile()) {
+            const ext = path.extname(resolved).toLowerCase();
+            const ct = ext === '.png' ? 'image/png' : ext === '.ttf' ? 'font/ttf' : ext === '.svg' ? 'image/svg+xml' : 'application/octet-stream';
+            res.writeHead(200, { 'content-type': ct, 'cache-control': 'public, max-age=86400', 'x-content-type-options': 'nosniff' });
+            return res.end(fs.readFileSync(resolved));
+          }
+        }
+        if (u.pathname === '/favicon.ico') {
+          const fav = [path.join(__dirname, 'build', 'icon.png'), iconPath('Default')].find((p) => fs.existsSync(p));
+          if (fav) {
+            res.writeHead(200, { 'content-type': 'image/png', 'cache-control': 'public, max-age=86400', 'x-content-type-options': 'nosniff' });
+            return res.end(fs.readFileSync(fav));
+          }
+          res.writeHead(204);
+          return res.end();
+        }
         res.writeHead(404);
         return res.end();
       } catch (e) {
@@ -305,7 +324,22 @@ ipcMain.on('dw:msg', async (e, raw) => {
 
 // ------------------------------------------------------------------ النافذة والأيقونة
 const iconPath = (name) => path.join(__dirname, 'assets', 'icons', (name || 'Default') + '.png');
-const appIcon = () => nativeImage.createFromPath(iconPath(bridge ? bridge.state().icon : 'Default'));
+const appIcon = () => {
+  const candidates = [
+    iconPath(bridge ? bridge.state().icon : 'Default'),
+    iconPath('Default'),
+    path.join(__dirname, 'build', 'icon.png')
+  ];
+  for (const p of candidates) {
+    try {
+      if (fs.existsSync(p)) {
+        const img = nativeImage.createFromPath(p);
+        if (img && !img.isEmpty()) return img;
+      }
+    } catch (e) { /* تجاهل */ }
+  }
+  return nativeImage.createEmpty();
+};
 
 function protectWindow(bw) {
   if (!bw || bw.isDestroyed()) return;
@@ -409,16 +443,22 @@ function showWin() {
 }
 
 function createWindow() {
+  const initIcon = appIcon();
   win = new BrowserWindow({
-    width: 1000, height: 820, minWidth: 360, minHeight: 560,
-    title: APP_NAME, icon: appIcon(), backgroundColor: '#B22127', autoHideMenuBar: true, show: false,
+    width: 1280, height: 860, minWidth: 360, minHeight: 560,
+    title: APP_NAME, icon: initIcon.isEmpty() ? undefined : initIcon, backgroundColor: '#B22127', autoHideMenuBar: true, show: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'), contextIsolation: true, sandbox: true, nodeIntegration: false,
       spellcheck: false, autoplayPolicy: 'no-user-gesture-required', devTools: !app.isPackaged
     }
   });
   applyProtection(); // يمنع لقطة الشاشة وتسجيلها (ويندوز وماك)
-  win.once('ready-to-show', () => { applyProtection(); win.show(); });
+  win.once('ready-to-show', () => {
+    const icImg = appIcon();
+    if (!icImg.isEmpty()) try { win.setIcon(icImg); } catch (e) { /* تجاهل */ }
+    applyProtection();
+    win.show();
+  });
   win.on('show', applyProtection);
   win.on('restore', applyProtection);
   win.on('focus', () => {
@@ -589,6 +629,10 @@ app.whenReady().then(async () => {
     }
   );
 
+  if (process.platform === 'darwin' && app.dock) {
+    const dockImg = appIcon();
+    if (!dockImg.isEmpty()) app.dock.setIcon(dockImg);
+  }
   createWindow();
   createTray();
   setInterval(() => bridge.tick(), 20000);

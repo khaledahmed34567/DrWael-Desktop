@@ -73,3 +73,46 @@ test('server security helpers validate owner key and strip GitHub URLs from rele
   assert.equal(Object.keys(FALLBACK_TARGETS).length, 6);
 });
 
+test('buildDesktopZip packages updated Desktop repo files and icons without HTML export or owner key', () => {
+  const fs = require('node:fs');
+  const path = require('node:path');
+  const { buildDesktopZip } = require('../scripts/build-desktop-zip');
+
+  const iconPath = path.join(__dirname, '..', 'build', 'icon.png');
+  assert.equal(fs.existsSync(iconPath), true, 'build/icon.png must exist for Electron desktop builds');
+
+  const { buffer, files } = buildDesktopZip();
+  assert.ok(buffer.length > 100000, 'Expected non-empty desktop zip archive');
+  assert.equal(buffer.readUInt32LE(0), 0x04034b50, 'Expected valid PKZIP signature');
+
+  for (const reqFile of [
+    'package.json',
+    'main.js',
+    'preload.js',
+    'bridge.js',
+    'dialog.html',
+    'dialog-preload.js',
+    'config.json',
+    '.github/workflows/build.yml',
+    'build/icon.png',
+    'assets/icons/Default.png',
+    'app/index.html',
+    'app/course-alerts.js',
+    'app/course-features.js',
+    'app/student-badges.js',
+    'app/progress-chart.js'
+  ]) {
+    assert.ok(files.includes(reqFile), `Expected ${reqFile} in desktop zip`);
+  }
+
+  for (const forbidden of ['DrWael.html', '.html-export.key', 'server.js', 'DrWael-Desktop-Project.zip']) {
+    assert.equal(files.includes(forbidden), false, `Must exclude ${forbidden} from desktop repo zip`);
+  }
+
+  const indexHtml = fs.readFileSync(path.join(__dirname, '..', 'app', 'index.html'), 'utf8');
+  assert.ok(indexHtml.includes('.wrap{width:100%;max-width:none;margin:0;'), 'Expected full-width .wrap rule in app/index.html');
+  assert.ok(indexHtml.includes('.dlb{width:100%;max-width:none;margin:0;'), 'Expected full-width .dlb rule in app/index.html');
+  assert.equal(indexHtml.includes('/download/desktop-zip'), false, 'Student UI must never expose /download/desktop-zip');
+});
+
+
