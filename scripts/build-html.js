@@ -10,7 +10,8 @@ const INLINE_SCRIPTS = [
   'course-alerts.js',
   'course-features.js',
   'student-badges.js',
-  'progress-chart.js'
+  'progress-chart.js',
+  'student-pro.js'
 ];
 
 function safeInlineScript(code) {

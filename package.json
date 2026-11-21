@@ -13,7 +13,7 @@
     "build": "node scripts/build-html.js",
     "start": "node server.js",
     "desktop:zip": "node scripts/build-desktop-zip.js",
-    "lint": "node --check server.js main.js preload.js bridge.js dialog-preload.js scripts/build-html.js scripts/build-desktop-zip.js app/course-alerts.js app/course-features.js app/student-badges.js app/progress-chart.js tests/course-alerts.test.js tests/course-features.test.js tests/student-badges.test.js tests/progress-chart.test.js tests/standalone-html.test.js && node -e \"const fs=require('fs'),vm=require('vm'),h=fs.readFileSync('app/index.html','utf8');for(const m of h.matchAll(/<script(?![^>]*\\\\bsrc=)[^>]*>([\\\\s\\\\S]*?)<\\\\/script>/gi))new vm.Script(m[1]);console.log('Lint OK')\"",
+    "lint": "node --check server.js main.js preload.js bridge.js dialog-preload.js scripts/build-html.js scripts/build-desktop-zip.js app/course-alerts.js app/course-features.js app/student-badges.js app/progress-chart.js app/student-pro.js tests/course-alerts.test.js tests/course-features.test.js tests/student-badges.test.js tests/progress-chart.test.js tests/student-pro.test.js tests/standalone-html.test.js && node -e \"const fs=require('fs'),vm=require('vm'),h=fs.readFileSync('app/index.html','utf8');for(const m of h.matchAll(/<script(?![^>]*\\\\bsrc=)[^>]*>([\\\\s\\\\S]*?)<\\\\/script>/gi))new vm.Script(m[1]);console.log('Lint OK')\"",
     "electron:start": "electron .",
     "dist": "electron-builder"
   },

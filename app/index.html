@@ -577,6 +577,29 @@ body.dw-blur>:not(#dw-shield){filter:blur(24px)}
   .grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:18px}
 }
 @media print{html,body{display:none!important;visibility:hidden!important;opacity:0!important}}
+.cor-row{display:grid;grid-template-columns:1fr;gap:10px;margin:0 0 12px}
+.cor-row .cor{margin:0}
+.cor.hub{background:linear-gradient(135deg,#0f3d4c,#1b6ca8);box-shadow:0 4px 18px rgba(15,61,76,.18)}
+@media (min-width:740px){.cor-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}}
+.pro-gift{background:linear-gradient(135deg,color-mix(in srgb,var(--gold) 15%,var(--card)),color-mix(in srgb,var(--accent) 8%,var(--card)));border:1.5px solid color-mix(in srgb,var(--gold) 45%,var(--brd));border-radius:18px;padding:14px 16px;margin:0 0 12px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
+.pro-gift b{display:block;font-size:15px;color:var(--ink)}
+.pro-gift small{display:block;font-size:12.5px;color:var(--sub);margin-top:3px;line-height:1.5}
+.pro-gift .pg-btn{padding:9px 14px;border-radius:12px;background:var(--gold);color:#1d1602;font-weight:800;font-size:12.5px;flex:none}
+.pro-note{background:color-mix(in srgb,var(--err) 8%,var(--card));border:1px solid color-mix(in srgb,var(--err) 28%,var(--brd));border-radius:14px;padding:11px 13px;font-size:13px;font-weight:700;color:var(--ink);line-height:1.55;margin-top:10px}
+.fc-card{background:linear-gradient(155deg,var(--card),color-mix(in srgb,var(--h1) 6%,var(--card)));border:1.5px solid var(--brd);border-radius:20px;padding:22px 18px;min-height:190px;display:flex;flex-direction:column;justify-content:space-between;gap:12px;cursor:pointer;box-shadow:0 8px 24px rgba(15,23,42,.08);transition:transform .16s ease,border-color .16s ease}
+.fc-card:hover{border-color:var(--gold)}
+.fc-card.flipped{background:linear-gradient(155deg,color-mix(in srgb,var(--ok) 9%,var(--card)),var(--card));border-color:color-mix(in srgb,var(--ok) 45%,var(--brd))}
+.fc-meta{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;font-weight:800;color:var(--sub)}
+.fc-tag{padding:3px 9px;border-radius:8px;background:color-mix(in srgb,var(--gold) 18%,transparent);color:var(--ink);font-size:11.5px}
+.fc-txt{font-size:17px;font-weight:800;line-height:1.65;color:var(--ink);text-align:center;margin:8px 0}
+.fc-hint{font-size:12px;color:var(--sub);text-align:center}
+.fc-acts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.gpa-row{display:grid;grid-template-columns:1.6fr .7fr 1fr auto;gap:6px;align-items:center;margin-bottom:8px}
+.gpa-row .fi{margin:0;padding:10px}
+.calc-res{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-top:10px}
+.calc-box{background:var(--bg);border:1px solid var(--brd);border-radius:12px;padding:10px;text-align:center}
+.calc-box b{display:block;font-size:18px;color:var(--ink);font-variant-numeric:tabular-nums}
+.calc-box small{font-size:11.5px;color:var(--sub)}
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -591,6 +614,7 @@ body.dw-blur>:not(#dw-shield){filter:blur(24px)}
 <script src="course-features.js"></script>
 <script src="student-badges.js"></script>
 <script src="progress-chart.js"></script>
+<script src="student-pro.js"></script>
 </head><body>
 <div id="dw-shield" aria-hidden="true"><b>محتوى محمي</b><span>التصوير أو لقطة الشاشة غير مسموح · Protected content — Screenshots blocked</span></div>
 <div id="dw-wm" aria-hidden="true"></div>
@@ -1889,7 +1913,7 @@ function courseDetailsHTML(c,L_,Tk){
   </section>`;
 }
 async function vCourse(id){const c=CS.find(x=>x.id===id);const cTitle=lang==="ar"?c.title:(c.titleEn||c.title);body.innerHTML=`<button class="btn ghost" id="bk">${t("close")}</button><div class="sp"></div>${su(c.cover)?`<div class="cvb" style="background-image:url(${esc(cssUrl(c.cover))})"><b>${esc(cTitle)}</b></div>`:`<div class="lab">${esc(cTitle)}</div>`}<div id="cd_">${courseDetailsHTML(c,CT.lecs[id]||null,CT.tasks[id]||null)}</div><div id="cb"></div><div id="crev_"></div>`;$("#bk").onclick=vCourses;
-if(c.price>0&&!SUBS[id]&&P.role!=="admin"){$("#cb").innerHTML=`<div class="stat">${t("payNote")}</div><button class="btn gold" id="py" style="margin-top:10px">${t("pay")}</button>`;$("#py").onclick=()=>payModal(id,c.price,c.title);renderCourseReviews(c,[],{},true);return}
+if(!canCourse(c)){$("#cb").innerHTML=`<div class="stat">${t("payNote")}</div><div class="pro-note">${L("ملاحظة: اشتراك برو المجاني لمدة سنة لا يشمل اشتراك الدورات المدفوعة.","Note: The 1-year free Pro plan does not include paid course subscriptions.")}</div><button class="btn gold" id="py" style="margin-top:10px">${t("pay")}</button>`;$("#py").onclick=()=>payModal(id,c.price,c.title);renderCourseReviews(c,[],{},true);return}
 const[ls_,ts,pr]=await Promise.all([db.collection("lectures").where("courseId","==",id).get(),db.collection("tasks").where("courseId","==",id).get(),db.collection("progress").where("uid","==",U.uid).where("courseId","==",id).get()]);
 PR={};pr.docs.forEach(d=>PR[d.data().taskId]=d.data());
 const so=(a,b)=>(a.order||0)-(b.order||0);const L_=ls_.docs.map(d=>({id:d.id,...d.data()})).sort(so),Tk=ts.docs.map(d=>({id:d.id,...d.data()})).sort(so);
@@ -2252,9 +2276,9 @@ if($("#so"))$("#so").onclick=async()=>{const v=nd($("#np").value);if(v&&await sh
 if($("#sbio"))$("#sbio").onclick=async()=>{try{if(!ls.get(lk()))throw 0;const c=await navigator.credentials.create({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),rp:{name:"Dr. Wael"},user:{id:crypto.getRandomValues(new Uint8Array(16)),name:P.email,displayName:P.nameEn},pubKeyCredParams:[{type:"public-key",alg:-7},{type:"public-key",alg:-257}],authenticatorSelection:{authenticatorAttachment:"platform",userVerification:"required"},timeout:60000}});ls.set(lk()+"_bio",b64(c.rawId));$("#lmx").innerHTML=`<div class="stat ok">${t("on")}</div>`}catch(e){$("#lmx").innerHTML=`<div class="stat err">${t("setPin")}</div>`}};
 }
 /* ---------- me ---------- */
-function vMe(){const totN=NT.length+getLNT().length;body.innerHTML=`<div class="card"><h2>${esc(lang==="ar"?P.nameAr:P.nameEn)}</h2><p class="small">${esc(P.email)} · ${esc(P.phone)}${VIP()?" · Pro":""}</p><p class="small">${t("yr")}: ${t("y"+P.year)} · ${t("t"+P.term)}</p>${[["settings","sliders"],["card","idc"],["group","users"],["notif","bell"],["myPays","card"],["reminders","clock"],["sup","chat"],["fb","rules"],["lockH","lock"],["off","down"],["dl","download"],["terms","book"]].filter(x=>!(NAT&&((x[0]==="lockH"&&!DESK)||x[0]==="dl"))&&!(!NAT&&x[0]==="off")).map(x=>`<button class="trow" data-m="${x[0]}"><span>${t(x[0])}${x[0]==="notif"&&totN?" ("+totN+")":""}</span>${ic(x[1],20)}</button>`).join("")}${!VIP()&&P.role!=="admin"?`<button class="btn gold" id="vb" style="margin-top:10px">${t("vipBuy")}</button>`:""}<button class="btn ghost" id="lgb" style="margin-top:10px">${t("lang")}</button><button class="btn ghost" id="lo" style="margin-top:8px">${t("logout")}</button></div><div id="meBadges"></div><footer>${mail("contact@sarmad.qd.je")}<br>${t("rights")}${VER?"<br>v"+esc(VER):""}</footer>`;
+function vMe(){const totN=NT.length+getLNT().length,pi=proInfo();const proLbl=pi.active?(pi.freeYearActive&&!pi.paid&&!pi.isAdmin?L(" · Pro مجاني لمدة سنة (لا يشمل الدورات)"," · Free Pro (1 year · excludes courses)"):" · Pro"):"";body.innerHTML=`<div class="card"><h2>${esc(lang==="ar"?P.nameAr:P.nameEn)}</h2><p class="small">${esc(P.email)} · ${esc(P.phone)}${esc(proLbl)}</p><p class="small">${t("yr")}: ${t("y"+P.year)} · ${t("t"+P.term)}</p>${[["hub","grad"],["subs","spark"],["settings","sliders"],["card","idc"],["group","users"],["notif","bell"],["myPays","card"],["reminders","clock"],["sup","chat"],["fb","rules"],["lockH","lock"],["off","down"],["dl","download"],["terms","book"]].filter(x=>!(NAT&&((x[0]==="lockH"&&!DESK)||x[0]==="dl"))&&!(!NAT&&x[0]==="off")).map(x=>`<button class="trow" data-m="${x[0]}"><span>${x[0]==="hub"?L("حقيبة الطالب الذكية (بطاقات · خطة · GPA · مفكرة)","Smart Student Hub (Cards · Planner · GPA · Notes)"):t(x[0])}${x[0]==="notif"&&totN?" ("+totN+")":""}</span>${ic(x[1]==="grad"?"spark":x[1],20)}</button>`).join("")}${!VIP()&&P.role!=="admin"?`<button class="btn gold" id="vb" style="margin-top:10px">${t("vipBuy")}</button>`:""}<button class="btn ghost" id="lgb" style="margin-top:10px">${t("lang")}</button><button class="btn ghost" id="lo" style="margin-top:8px">${t("logout")}</button></div><div id="meBadges"></div><footer>${mail("contact@sarmad.qd.je")}<br>${t("rights")}${VER?"<br>v"+esc(VER):""}</footer>`;
 $("#lgb").onclick=()=>{lang=lang==="ar"?"en":"ar";ls.set("dw_lang",lang);applyLang()};$("#lo").onclick=()=>{nreq("logout");auth.signOut().then(()=>{stopCourseAlertWatch();_pb=false;U=P=null;show("auth")})};if($("#vb"))$("#vb").onclick=vSubs;
-$$("[data-m]").forEach(b=>b.onclick=()=>({settings:vSettings,card:vMyCard,group:vGroup,reminders:vRem,notif:vNotif,myPays:vMyPays,sup:vSup,fb:vFb,lockH:vLock,terms:showTerms,dl:showDl,off:showOff})[b.dataset.m]());
+$$("[data-m]").forEach(b=>b.onclick=()=>({hub:()=>vStudentHub(),subs:vSubs,settings:vSettings,card:vMyCard,group:vGroup,reminders:vRem,notif:vNotif,myPays:vMyPays,sup:vSup,fb:vFb,lockH:vLock,terms:showTerms,dl:showDl,off:showOff})[b.dataset.m]());
 renderProfileBadges();hydrateBadgesForProfile()}
 function vNotif(){
   const lnt=getLNT();
@@ -2580,14 +2604,17 @@ document.body.appendChild(o);$("#offx").onclick=()=>o.remove();offList()}
 /* ===== part3: wallet, gateway, plans, success, forced lock, home ===== */
 Object.assign(T.ar,{openPay:"افتح إنستا باي للتحويل",copy:"نسخ",copied:"تم النسخ",wait1:"انتظر دقيقة قبل إرسال طلب دفع جديد.",bigF:"حجم الصورة كبير (الحد 6MB).",bioFail:"فشل التحقق بالبصمة أو الوجه.",dCourses:"دوراتي",dDone:"مهام مكتملة",dPro:"اشتراك برو",dOn:"نشط",dOff:"غير مشترك",ai:"د. وائل AI",wallet:"المحفظة",subs:"الاشتراكات",search:"ابحث عن دورة",myCourses:"دوراتي",topup:"شحن المحفظة",bal:"الرصيد الحالي",custom:"مبلغ آخر",charge:"اشحن",plan1:"اشتراك برو شهر",plan3:"اشتراك برو 3 شهور",planD:"المنتدى الخاص وأولوية النشر والذكاء الاصطناعي",until:"ينتهي في",noPrice:"السعر غير محدد بعد",gwT:"بوابة الدفع الآمنة",gwS:"Dr. Wael Pay",gwItem:"البند",gwUser:"الطالب",gwRef:"المرجع",gwTr:"تحويل وإيصال",gwPay:"ادفع الآن",gwSec:"معاملة مشفّرة وآمنة",gwProc:"جاري تأكيد العملية...",gwOk:"تمت العملية بنجاح",gwOkS:"تم خصم المبلغ وتفعيل خدمتك.",gwWait:"تم استلام طلبك",gwWaitS:"سنراجع الإيصال وتصلك رسالة فور القبول.",gwWal:"سيتم الخصم من رصيد محفظتك فورًا.",okT:"تم قبول عمليتك",okS:"تم تفعيل خدمتك. يمكنك الآن تحميل فاتورتك.",mailNote:"للتواصل",lang:"English",newPin:"أنشئ رمز PIN للدخول",pin2:"أعد كتابة الرمز",pinMis:"الرمزان غير متطابقين",lockReq:"قفل التطبيق إجباري لحماية حسابك ومحتواك.",imgs:"صور"});
 Object.assign(T.en,{openPay:"Open InstaPay to transfer",copy:"Copy",copied:"Copied",wait1:"Wait a minute before sending a new payment request.",bigF:"Image too large (6MB max).",bioFail:"Fingerprint / face check failed.",dCourses:"My courses",dDone:"Tasks done",dPro:"Pro plan",dOn:"Active",dOff:"Not subscribed",ai:"Dr. Wael AI",wallet:"Wallet",subs:"Plans",search:"Search courses",myCourses:"My courses",topup:"Top up wallet",bal:"Current balance",custom:"Other amount",charge:"Top up",plan1:"Pro · 1 month",plan3:"Pro · 3 months",planD:"Private forum, priority posting and AI",until:"Ends on",noPrice:"Price not set yet",gwT:"Secure checkout",gwS:"Dr. Wael Pay",gwItem:"Item",gwUser:"Student",gwRef:"Reference",gwTr:"Transfer & receipt",gwPay:"Pay now",gwSec:"Encrypted & secure transaction",gwProc:"Confirming your payment...",gwOk:"Payment successful",gwOkS:"The amount was deducted and your service is active.",gwWait:"Request received",gwWaitS:"We will review the receipt and notify you once accepted.",gwWal:"The amount is deducted from your wallet instantly.",okT:"Your payment was accepted",okS:"Your service is active. You can download your invoice now.",mailNote:"Contact",lang:"العربية",newPin:"Create your PIN",pin2:"Repeat the PIN",pinMis:"PINs do not match",lockReq:"App lock is required to protect your account and content.",imgs:"Images"});
-const VIP=()=>!!(P&&(P.vip||P.vipUntil>Date.now()));
+const proInfo=()=>window.DWStudentPro?window.DWStudentPro.evaluateProAccess(P,ST,Date.now()):{active:!!(P&&(P.role==="admin"||P.vip||P.vipUntil>Date.now())),paid:!!(P&&(P.vip||P.vipUntil>Date.now())),freeYearActive:false,isAdmin:!!(P&&P.role==="admin"),effectiveUntil:(P&&P.vipUntil)||0,daysRemaining:0,includesCourses:false,source:"none"};
+const VIP=()=>proInfo().active;
+const canCourse=c=>window.DWStudentPro?window.DWStudentPro.hasCourseAccess(c,SUBS,P):!(c&&c.price>0&&!SUBS[c.id]&&P&&P.role!=="admin");
 const mail=e=>`<a href="mailto:${e}" style="color:inherit;text-decoration:underline;pointer-events:auto">${e}</a>`;
 const PAST=["#fde7d9","#dfe9ff","#e1f3e8","#f5e3f4","#fff0cc","#e0f2f4"];
 function hdr(){if(!P)return;$("#wl").innerHTML=ic("card",18)+`<span>${P.wallet||0} ${t("egp")}</span>`;$("#av").textContent=((P.nameEn||P.nameAr||"?")[0]||"?").toUpperCase();const unreadN=getLNT().filter(n=>!n.read).length;$("#qa").innerHTML=[["wallet","card"],["subs","spark"],["tools","grid"],["sup","chat"],["notif","bell"]].map(x=>`<button data-q="${x[0]}">${ic(x[1],26)}<span>${t(x[0])}</span>${x[0]==="notif"&&unreadN?`<i class="qbad">${unreadN>99?"99+":unreadN}</i>`:""}</button>`).join("");$$("[data-q]").forEach(b=>b.onclick=()=>({wallet:vWallet,subs:vSubs,tools:vTools,sup:vSup,notif:vNotif})[b.dataset.q]());$("#wl").onclick=vWallet;$("#av").onclick=()=>nav("me")}
 let CQ="";
-function vCourses(){body.innerHTML=`<div id="updHost"></div><input class="srch" id="sq" placeholder="${t("search")}" value="${esc(CQ)}"><div class="dash" id="dsh"></div><button class="cor" id="gcard">${ic("users",26)}<span><b>${t("group")}</b><small>${L("دردشة الطلاب والفريق • القواعد • التقرير","Student & team chat • rules • report")}</small></span></button><div class="ttl">${t("myCourses")}</div><div id="cg"></div>`;mountUpdateBanner();dash();$("#sq").oninput=e=>{CQ=e.target.value;grid()};grid();$("#gcard").onclick=vGroup}
+function vCourses(){const pi=proInfo();const giftBanner=pi.freeYearActive&&!pi.paid?`<div class="pro-gift"><div><b>${L("ميزة برو مفتوحة للجميع مجانًا لمدة سنة!","Pro features unlocked FREE for everyone for 1 year!")}</b><small>${L("كل أدوات برو (د. وائل AI، تلخيص المحاضرات، المنتدى الخاص، الثيمات، حقيبة الطالب) مفعّلة حتى","All Pro tools (Dr. Wael AI, task summaries, Pro forum, themes, Student Hub) active until")} ${esc(fd(pi.effectiveUntil))} · ${L("لا يشمل اشتراك الدورات (الدورات باشتراك مدفوع)","Excludes paid course subscriptions")}</small></div><button class="pg-btn" id="pgBtn">${L("تفاصيل برو","Pro details")}</button></div>`:"";
+body.innerHTML=`<div id="updHost"></div>${giftBanner}<input class="srch" id="sq" placeholder="${t("search")}" value="${esc(CQ)}"><div class="dash" id="dsh"></div><div class="cor-row"><button class="cor" id="gcard">${ic("users",26)}<span><b>${t("group")}</b><small>${L("دردشة الطلاب والفريق • القواعد • التقرير","Student & team chat • rules • report")}</small></span></button><button class="cor hub" id="hubcard">${ic("spark",26)}<span><b>${L("حقيبة الطالب الذكية","Smart Student Hub")}</b><small>${L("بطاقات مراجعة • خطة يومية • حاسبة GPA والمحاليل • مفكرتي","Flashcards • Daily Planner • GPA & Fluids • Study Notes")}</small></span></button></div><div class="ttl">${t("myCourses")}</div><div id="cg"></div>`;mountUpdateBanner();dash();$("#sq").oninput=e=>{CQ=e.target.value;grid()};grid();$("#gcard").onclick=vGroup;$("#hubcard").onclick=()=>vStudentHub();if($("#pgBtn"))$("#pgBtn").onclick=vSubs}
 function grid(){const q=CQ.trim().toLowerCase(),l=CS.filter(c=>((c.year===P.year&&c.term===P.term)||(P.extra||[]).includes(c.id))&&(!q||(c.title+" "+(c.titleEn||"")).toLowerCase().includes(q)));
-$("#cg").innerHTML=l.length?`<div class="grid">`+l.map((c,i)=>{const dt=window.DWCourseAlerts?window.DWCourseAlerts.buildCourseDetails(c,CT.lecs[c.id]||null,null,lang,CT.lec[c.id]):{instructor:c.instructor||"",lectureCountText:"",summary:c.summary||""};return`<button class="tile${su(c.cover)?" cv":""}" data-c="${esc(c.id)}" style="--p:${PAST[i%PAST.length]};${su(c.cover)?"background-image:url("+esc(cssUrl(c.cover))+")":""}"><b>${esc(lang==="ar"?c.title:c.titleEn||c.title)}</b><div class="tile-meta" data-cm="${esc(c.id)}"><span>${esc(dt.instructor)}</span><span>${esc(dt.lectureCountText)}</span></div><div class="tile-sum" data-cs="${esc(c.id)}">${esc(dt.summary)}</div><span class="tb">${ic("book",58)}</span><div class="cprog-foot"><div data-cp="${esc(c.id)}" style="width:100%">${cprogHTML(c)}</div><span class="tp">${c.price>0?esc(c.price)+" "+t("egp"):t("free")}${c.price>0&&!SUBS[c.id]?ic("lock",14):""}</span></div></button>`}).join("")+`</div>`:`<div class="empty">${t("noC")}</div>`;$$("[data-c]").forEach(b=>b.onclick=()=>vCourse(b.dataset.c));loadCourseTotals(l)}
+$("#cg").innerHTML=l.length?`<div class="grid">`+l.map((c,i)=>{const dt=window.DWCourseAlerts?window.DWCourseAlerts.buildCourseDetails(c,CT.lecs[c.id]||null,null,lang,CT.lec[c.id]):{instructor:c.instructor||"",lectureCountText:"",summary:c.summary||""};const locked=!canCourse(c);return`<button class="tile${su(c.cover)?" cv":""}" data-c="${esc(c.id)}" style="--p:${PAST[i%PAST.length]};${su(c.cover)?"background-image:url("+esc(cssUrl(c.cover))+")":""}"><b>${esc(lang==="ar"?c.title:c.titleEn||c.title)}</b><div class="tile-meta" data-cm="${esc(c.id)}"><span>${esc(dt.instructor)}</span><span>${esc(dt.lectureCountText)}</span></div><div class="tile-sum" data-cs="${esc(c.id)}">${esc(dt.summary)}</div><span class="tb">${ic("book",58)}</span><div class="cprog-foot"><div data-cp="${esc(c.id)}" style="width:100%">${cprogHTML(c)}</div><span class="tp">${c.price>0?esc(c.price)+" "+t("egp"):t("free")}${locked?ic("lock",14):""}</span></div></button>`}).join("")+`</div>`:`<div class="empty">${t("noC")}</div>`;$$("[data-c]").forEach(b=>b.onclick=()=>vCourse(b.dataset.c));loadCourseTotals(l)}
 function payModal(item,amount,title){if(item==="vip")return vSubs();gw({item,title,amount,kind:"course"})}
 /* ---------- gateway ---------- */
 function gw(o){const g=$("#gw");g.classList.remove("hide");let m=o.kind==="wallet"?"ip":((P.wallet||0)>=o.amount?"wl":"ip");const ref="DW-"+Date.now().toString(36).toUpperCase();
@@ -2609,7 +2636,13 @@ g.innerHTML=`<div class="psp"><div class="pst"><span>Powered by</span><img src="
 const fh=async f=>[...new Uint8Array(await crypto.subtle.digest("SHA-256",await f.arrayBuffer()))].map(x=>x.toString(16).padStart(2,"0")).join("");
 const wait=async t0=>new Promise(r=>setTimeout(r,Math.max(0,1500-(Date.now()-t0))));
 /* ---------- plans & wallet ---------- */
-function vSubs(){const on=VIP();const pl=[["vipM1","plan1",ST.vipM1],["vipM3","plan3",ST.vipM3]];sub(t("subs"),`<div class="card">${on?`<div class="stat ok">${VIP()?"VIP":t("until")+" "+fd(P.vipUntil)}</div>`:""}<p class="small">${t("planD")}</p></div>`+pl.map(p=>`<div class="item"><div class="nm">${t(p[1])}</div><div class="meta">${p[2]?esc(p[2])+" "+t("egp"):t("noPrice")}</div><div class="acts"><button class="dl" data-pl="${p[0]}" ${p[2]?"":"disabled"}>${t("pay")}</button></div></div>`).join(""));
+function vSubs(){const pi=proInfo(),sp=window.DWStudentPro,feats=sp?sp.getProFeaturesList(lang):[];const pl=[["vipM1","plan1",ST.vipM1],["vipM3","plan3",ST.vipM3]];
+const statusBox=pi.active
+  ?`<div class="stat ok">${pi.freeYearActive&&!pi.paid&&!pi.isAdmin?L("ميزة برو مفعّلة مجانًا لمدة سنة لجميع الطلاب!","Pro features unlocked FREE for 1 full year for all students!")+" ("+L("متبقي","Remaining")+": "+pi.daysRemaining+" "+L("يوم","days")+" · "+t("until")+" "+fd(pi.effectiveUntil)+")":L("اشتراك برو نشط","Pro plan active")+(pi.effectiveUntil?(" · "+t("until")+" "+fd(pi.effectiveUntil)):"")}</div>`
+  :`<div class="stat">${L("باقة برو غير مفعلة حاليًا","Pro plan is not active right now")}</div>`;
+const featsHTML=feats.map(f=>`<div class="item" style="margin-bottom:8px"><div class="nm">${ic("ok",16)} ${esc(f.title)}</div><div class="meta">${esc(f.desc)}</div></div>`).join("");
+sub(t("subs"),`<div class="card">${statusBox}<div class="pro-note">${L("تنبيه مهم: باقة برو المجانية لمدة سنة لا تحتوي على اشتراك الدورات — الاشتراك في الدورات يظل مدفوعًا ومستقلًا لكل دورة.","Important note: The 1-year free Pro plan does NOT include course subscriptions — each paid course still requires a separate subscription.")}</div><button class="btn gold" id="subHub" style="margin-top:10px">${L("فتح حقيبة الطالب الذكية","Open Smart Student Hub")}</button></div><div class="lab">${L("المميزات المفتوحة لك الآن في برو","Unlocked Pro Features")}</div>${featsHTML}<div class="lab">${L("خطط التمديد الاختيارية بعد السنة المجانية","Optional paid extension plans")}</div>`+pl.map(p=>`<div class="item"><div class="nm">${t(p[1])}</div><div class="meta">${p[2]?esc(p[2])+" "+t("egp"):t("noPrice")}</div><div class="acts"><button class="dl" data-pl="${p[0]}" ${p[2]?"":"disabled"}>${t("pay")}</button></div></div>`).join(""));
+if($("#subHub"))$("#subHub").onclick=()=>vStudentHub();
 $$("[data-pl]").forEach(b=>b.onclick=()=>{const p=pl.find(x=>x[0]===b.dataset.pl);gw({kind:"vip",item:p[0],title:t(p[1]),amount:+p[2]})})}
 async function vWallet(){sub(t("wallet"),`<div class="card wcard"><small>${t("bal")}</small><div class="wbal"><b>${P.wallet||0}</b> ${t("egp")}</div></div><div class="card"><div class="lab">${t("topup")}</div><div class="chips" id="wa">${[50,100,200,500].map(a=>`<button class="chip" data-a="${a}">${a}</button>`).join("")}</div><input class="fi" id="wc" type="number" inputmode="numeric" min="10" placeholder="${t("custom")}" style="margin-top:10px"><button class="btn gold" id="wg">${t("charge")}</button></div><div class="lab">${t("myPays")}</div><div id="pl2"></div>`);
 $$("[data-a]").forEach(b=>b.onclick=()=>{$("#wc").value=b.dataset.a});$("#wg").onclick=()=>{const a=Math.floor(+$("#wc").value);if(!(a>=10)){$("#wc").focus();$("#wc").style.boxShadow="0 0 0 2px #d6455d";return}gw({kind:"wallet",item:"wallet",title:t("topup"),amount:a})};
@@ -2842,9 +2875,9 @@ async function renderCourseReviews(c,Tk,PR,lockedCourse){
   if(!hasEdits)paint(fresh);
 }
 const pbar=Tk=>{const tot=Tk.length,dn=Tk.filter(k=>PR[k.id]&&PR[k.id].done).length,p=tot?Math.round(dn/tot*100):0;return`<div class="card" style="padding:14px"><div style="display:flex;justify-content:space-between;font-weight:700;font-size:14px"><span>${L("تقدمك في الدورة","Your progress")}</span><span>${dn} / ${tot} — ${p}%</span></div><div class="bar${p===100&&tot?" full":""}" role="progressbar" aria-valuenow="${p}" aria-valuemin="0" aria-valuemax="100"><i style="width:${p}%"></i></div></div>`};
-function cprogHTML(c){const locked=c.price>0&&!SUBS[c.id]&&P.role!=="admin";if(locked)return"";const tot=CT.tot[c.id]!==undefined?CT.tot[c.id]:c.taskCount;const doneSet=DS&&DS.byC&&DS.byC[c.id];const validIds=CT.ids[c.id];const dn=doneSet?(validIds?[...doneSet].filter(id=>validIds.has(id)).length:doneSet.size):0;if(tot===undefined){return`<div class="cprog" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"><div class="cprog-top"><span>${L("المنهج","Curriculum")}</span><span class="cprog-pct">…</span></div><div class="cbar"><i style="width:0%"></i></div></div>`}const d=Math.min(dn,tot),p=tot?Math.round(d/tot*100):0;return`<div class="cprog${p===100&&tot?" full":""}" role="progressbar" aria-valuenow="${p}" aria-valuemin="0" aria-valuemax="100"><div class="cprog-top"><span>${tot?`${d} / ${tot}`:L("لا توجد دروس","No lessons")}</span><span class="cprog-pct">${p}%</span></div><div class="cbar"><i style="width:${p}%"></i></div></div>`}
+function cprogHTML(c){const locked=!canCourse(c);if(locked)return"";const tot=CT.tot[c.id]!==undefined?CT.tot[c.id]:c.taskCount;const doneSet=DS&&DS.byC&&DS.byC[c.id];const validIds=CT.ids[c.id];const dn=doneSet?(validIds?[...doneSet].filter(id=>validIds.has(id)).length:doneSet.size):0;if(tot===undefined){return`<div class="cprog" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"><div class="cprog-top"><span>${L("المنهج","Curriculum")}</span><span class="cprog-pct">…</span></div><div class="cbar"><i style="width:0%"></i></div></div>`}const d=Math.min(dn,tot),p=tot?Math.round(d/tot*100):0;return`<div class="cprog${p===100&&tot?" full":""}" role="progressbar" aria-valuenow="${p}" aria-valuemin="0" aria-valuemax="100"><div class="cprog-top"><span>${tot?`${d} / ${tot}`:L("لا توجد دروس","No lessons")}</span><span class="cprog-pct">${p}%</span></div><div class="cbar"><i style="width:${p}%"></i></div></div>`}
 function refreshGridProgress(courses){(courses||CS).forEach(c=>{const el=document.querySelector(`[data-cp="${CSS.escape(c.id)}"]`);if(el)el.innerHTML=cprogHTML(c);if(window.DWCourseAlerts){const dt=window.DWCourseAlerts.buildCourseDetails(c,CT.lecs[c.id]||null,null,lang,CT.lec[c.id]);const cm=document.querySelector(`[data-cm="${CSS.escape(c.id)}"]`),cs=document.querySelector(`[data-cs="${CSS.escape(c.id)}"]`);if(cm)cm.innerHTML=`<span>${esc(dt.instructor)}</span><span>${esc(dt.lectureCountText)}</span>`;if(cs)cs.textContent=dt.summary}})}
-async function loadCourseTotals(courses){const unlocked=courses.filter(c=>!(c.price>0&&!SUBS[c.id]&&P.role!=="admin"));if(!unlocked.length)return;const need=unlocked.filter(c=>!CT.at[c.id]||Date.now()-CT.at[c.id]>6e4);if(!need.length){refreshGridProgress(unlocked);try{renderProgressChartD3()}catch(e){}return}await Promise.allSettled(need.map(async c=>{try{const[ts,ls_]=await Promise.all([db.collection("tasks").where("courseId","==",c.id).get(),db.collection("lectures").where("courseId","==",c.id).get()]);const so=(a,b)=>(a.order||0)-(b.order||0);const tList=ts.docs.map(d=>({id:d.id,...d.data()})).sort(so);const lList=ls_.docs.map(d=>({id:d.id,...d.data()})).sort(so);CT.tot[c.id]=tList.length;CT.ids[c.id]=new Set(tList.map(k=>k.id));CT.lec[c.id]=lList.length;CT.lecs[c.id]=lList;CT.tasks[c.id]=tList;CT.at[c.id]=Date.now()}catch(e){CT.tot[c.id]=CT.tot[c.id]??0;CT.at[c.id]=Date.now()}}));refreshGridProgress(unlocked);try{renderProgressChartD3()}catch(e){}try{checkCourseAlerts()}catch(e){}try{syncStudentBadges({silent:true})}catch(e){}}
+async function loadCourseTotals(courses){const unlocked=courses.filter(c=>canCourse(c));if(!unlocked.length)return;const need=unlocked.filter(c=>!CT.at[c.id]||Date.now()-CT.at[c.id]>6e4);if(!need.length){refreshGridProgress(unlocked);try{renderProgressChartD3()}catch(e){}return}await Promise.allSettled(need.map(async c=>{try{const[ts,ls_]=await Promise.all([db.collection("tasks").where("courseId","==",c.id).get(),db.collection("lectures").where("courseId","==",c.id).get()]);const so=(a,b)=>(a.order||0)-(b.order||0);const tList=ts.docs.map(d=>({id:d.id,...d.data()})).sort(so);const lList=ls_.docs.map(d=>({id:d.id,...d.data()})).sort(so);CT.tot[c.id]=tList.length;CT.ids[c.id]=new Set(tList.map(k=>k.id));CT.lec[c.id]=lList.length;CT.lecs[c.id]=lList;CT.tasks[c.id]=tList;CT.at[c.id]=Date.now()}catch(e){CT.tot[c.id]=CT.tot[c.id]??0;CT.at[c.id]=Date.now()}}));refreshGridProgress(unlocked);try{renderProgressChartD3()}catch(e){}try{checkCourseAlerts()}catch(e){}try{syncStudentBadges({silent:true})}catch(e){}}
 /* ---------- local notifications + reminders ---------- */
 const lnKey=()=>"dw_lnotifs_"+(U?U.uid:"x");
 const seenLecKey=()=>"dw_seen_lec_"+(U?U.uid:"x");
@@ -3013,7 +3046,7 @@ function sendPrefs(){const c=CITY(),S=SET();nreq("prefs",{city:c[0],wt:(S.wt&&(V
 const WC={0:["صافي","Clear"],1:["غالبًا صافي","Mostly clear"],2:["غائم جزئيًا","Partly cloudy"],3:["غائم","Overcast"],45:["ضباب","Fog"],48:["ضباب","Fog"],51:["رذاذ","Drizzle"],61:["مطر خفيف","Light rain"],63:["مطر","Rain"],65:["مطر غزير","Heavy rain"],80:["زخات","Showers"],95:["عاصفة رعدية","Thunderstorm"]};
 const PN=[["Fajr","الفجر","Fajr"],["Sunrise","الشروق","Sunrise"],["Dhuhr","الظهر","Dhuhr"],["Asr","العصر","Asr"],["Maghrib","المغرب","Maghrib"],["Isha","العشاء","Isha"]];
 async function vTools(){const c=CITY(),cn=lang==="ar"?c[1]:c[2];
-sub(t("tools"),`<div class="card" id="tp"><div class="lab">${L("مواقيت الصلاة","Prayer times")} — ${esc(cn)}</div><div class="small">…</div></div><div class="card" id="tw"><div class="lab">${L("الطقس","Weather")} — ${esc(cn)}</div><div class="small">…</div></div>
+sub(t("tools"),`<div class="card" style="padding:14px"><div class="lab">${L("حقيبة الطالب الذكية","Smart Student Hub")}</div><p class="small" style="margin:0 0 8px">${L("بطاقات مراجعة بيطرية، خطة المذاكرة اليومية، حاسبة المعدل التراكمي (GPA)، حاسبة المحاليل الوريدية، ومفكرتك الدراسية.","Veterinary flashcards, daily study planner, GPA & IV fluid calculators, and your study notes.")}</p><button class="btn gold" id="openHubFromTools">${L("فتح حقيبة الطالب الآن","Open Student Hub now")}</button></div><div class="card" id="tp"><div class="lab">${L("مواقيت الصلاة","Prayer times")} — ${esc(cn)}</div><div class="small">…</div></div><div class="card" id="tw"><div class="lab">${L("الطقس","Weather")} — ${esc(cn)}</div><div class="small">…</div></div>
 <div class="card"><div class="lab">${L("المذاكرة (بومودورو)","Study timer (Pomodoro)")}</div><div class="pom"><b id="pmt">25:00</b></div><div class="chips" style="justify-content:center"><button class="chip" data-pm="25">25</button><button class="chip" data-pm="45">45</button><button class="chip" data-pm="10">10 (${L("راحة","break")})</button></div><div class="small" id="pms" style="text-align:center;margin-top:8px"></div></div>
 <div class="card"><div class="lab">${L("قاموس المصطلحات الطبية (إنجليزي ← عربي)","Medical dictionary (EN → AR)")}</div><input class="fi" id="dq" dir="ltr" placeholder="e.g. hemostasis"><button class="btn gold" id="dg">${L("ابحث","Search")}</button><div id="dr"></div></div>
 <div class="card"><div class="lab">${L("ويكيبيديا","Wikipedia")}</div><input class="fi" id="wq" placeholder="${L("اكتب موضوعًا (مثال: الكلب)","Topic (e.g. Dog)")}"><button class="btn gold" id="wg2">${L("ابحث","Search")}</button><div id="wr"></div></div>
@@ -3025,9 +3058,209 @@ sub(t("tools"),`<div class="card" id="tp"><div class="lab">${L("مواقيت ا�
 <div class="card"><div class="lab">${L("مراجع وكتب (Open Library)","Books & references (Open Library)")}</div><input class="fi" id="bkq" placeholder="veterinary anatomy" dir="ltr"><button class="btn gold" id="bkg">${L("ابحث","Search")}</button><div id="bkr"></div></div>
 <div class="card"><div class="lab">${L("نصيحة اليوم","Advice of the day")}</div><div id="adr"><button class="btn ghost" id="adg">${L("اعرض نصيحة","Show advice")}</button></div></div>
 <div class="card"><div class="lab">${L("حيوان اليوم","Animal of the day")}</div><div id="an"><button class="btn ghost" id="ag">${L("اعرض حيوانًا ومعلومة","Show an animal & a fact")}</button></div></div>`);
+$("#openHubFromTools").onclick=()=>vStudentHub();
 loadPrayer(c);loadWeather(c);pomWire();
 $("#dg").onclick=dict;$("#wg2").onclick=wiki;$("#pg2").onclick=pubmed;$("#ag").onclick=animal;$("#spg").onclick=species;$("#drg").onclick=drugs;$("#bkg").onclick=books;$("#adg").onclick=advice;ayah();
 $("#kg").onclick=()=>{const w=+$("#k1").value,d=+$("#k2").value,k=+$("#k3").value;if(!(w>0&&d>0&&k>0)){$("#kr").innerHTML=`<div class="stat err">${L("أدخل كل القيم بأرقام موجبة","Enter all values as positive numbers")}</div>`;return}const mg=w*d;$("#kr").innerHTML=`<div class="stat ok">${L("الجرعة الكلية","Total dose")}: ${mg.toFixed(2)} mg<br>${L("الحجم المطلوب","Volume")}: ${(mg/k).toFixed(2)} mL</div>`}}
+/* ---------- Smart Student Hub (Flashcards, Study Planner, GPA & Fluids, Notes) ---------- */
+let _hubTab="cards",_fcSubj="all",_fcIdx=0,_fcFlip=false,_gpaRows=null;
+function vStudentHub(tab){
+  if(tab)_hubTab=tab;
+  const sp=window.DWStudentPro;
+  const uid=U?U.uid:"x";
+  const fcCustomKey="dw_fc_custom_"+uid,fcProgKey="dw_fc_prog_"+uid,planKey="dw_plan_"+uid,goalKey="dw_goal_"+uid,notesKey="dw_studynotes_"+uid;
+  const getArr=k=>{const a=getJSON(k,[]);return Array.isArray(a)?a:[]};
+  const getObj=k=>{const o=getJSON(k,{});return o&&typeof o==="object"&&!Array.isArray(o)?o:{}};
+
+  const renderTabs=()=>{
+    const tabs=[
+      ["cards",L("البطاقات","Flashcards")],
+      ["planner",L("خطتي","Planner")],
+      ["calc",L("GPA ومحاليل","GPA & Fluids")],
+      ["notes",L("مفكرتي","Notes")]
+    ];
+    return`<div class="seg" style="margin-bottom:12px">${tabs.map(x=>`<button data-ht="${x[0]}" class="${_hubTab===x[0]?"on":""}">${esc(x[1])}</button>`).join("")}</div><div id="hubBody"></div>`;
+  };
+
+  sub(L("حقيبة الطالب الذكية","Smart Student Hub"),renderTabs());
+  $$("[data-ht]").forEach(b=>b.onclick=()=>{_hubTab=b.dataset.ht;drawTab()});
+
+  function drawTab(){
+    $$("[data-ht]").forEach(b=>b.classList.toggle("on",b.dataset.ht===_hubTab));
+    const hb=$("#hubBody");if(!hb)return;
+
+    if(_hubTab==="cards"){
+      const defaults=sp?sp.getDefaultFlashcards(lang):[];
+      const custom=getArr(fcCustomKey);
+      const allCards=[...custom,...defaults];
+      const prog=getObj(fcProgKey);
+      const stats=sp?sp.computeFlashcardStats(allCards,prog):{total:allCards.length,mastered:0,needsReview:0,unseen:allCards.length,percent:0};
+      const subjects=[
+        ["all",L("الكل","All")],
+        ["anatomy",L("التشريح","Anatomy")],
+        ["physiology",L("الفسيولوجي","Physiology")],
+        ["pharmacology",L("الفارماكولوجي","Pharmacology")],
+        ["micro",L("الطفيليات والميكرو","Micro & Para")],
+        ["clinical",L("العيادة والطوارئ","Clinical")],
+        ["custom",L("بطاقاتي","My cards")]
+      ];
+      const pool=allCards.filter(c=>_fcSubj==="all"||c.subject===_fcSubj);
+      if(_fcIdx>=pool.length)_fcIdx=0;
+      const card=pool[_fcIdx]||null;
+      const st=card&&prog[card.id]?prog[card.id].status:"";
+      hb.innerHTML=`
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:13.5px;margin-bottom:6px">
+            <span>${L("نسبة الإتقان","Mastery")}: ${stats.mastered} / ${stats.total}</span>
+            <span>${stats.percent}%</span>
+          </div>
+          <div class="bar${stats.percent===100&&stats.total?" full":""}"><i style="width:${stats.percent}%"></i></div>
+          <div class="chips" style="margin-top:10px">${subjects.map(s=>`<button class="chip ${_fcSubj===s[0]?"on":""}" data-fcs="${s[0]}">${esc(s[1])}</button>`).join("")}</div>
+        </div>
+        ${card?`
+          <div class="fc-card${_fcFlip?" flipped":""}" id="fcFlip">
+            <div class="fc-meta">
+              <span class="fc-tag">${esc(card.subjectLabel||card.subject)} · ${_fcIdx+1}/${pool.length}</span>
+              <span>${st==="mastered"?L("✓ مُتقنة","✓ Mastered"):st==="review"?L("↻ للمراجعة","↻ Review"):L("جديدة","New")}</span>
+            </div>
+            <div class="fc-txt">${esc(_fcFlip?card.back:card.front)}</div>
+            <div class="fc-hint">${_fcFlip?L("الإجابة — اضغط للعودة للسؤال","Answer — tap to show question"):L("اضغط على البطاقة لإظهار الإجابة","Tap card to reveal answer")}</div>
+          </div>
+          <div class="fc-acts">
+            <button class="btn gold" id="fcMaster">${L("✓ أتقنتها","✓ Mastered")}</button>
+            <button class="btn ghost" id="fcReview">${L("↻ راجعها لاحقًا","↻ Review later")}</button>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button class="btn ghost" id="fcPrev">${L("السابق","Previous")}</button>
+            <button class="btn ghost" id="fcNext">${L("التالي","Next")}</button>
+          </div>
+        `:`<div class="empty">${L("لا توجد بطاقات في هذا القسم بعد.","No cards in this section yet.")}</div>`}
+        <div class="card" style="margin-top:12px">
+          <div class="lab">${L("أضف بطاقة مراجعة خاصة بك","Add your own flashcard")}</div>
+          <input class="fi" id="fcNewQ" placeholder="${L("السؤال أو المصطلح","Question or term")}">
+          <textarea class="fi" id="fcNewA" rows="2" placeholder="${L("الإجابة أو الشرح المختصر","Answer or summary")}"></textarea>
+          <button class="btn gold" id="fcAdd">${L("حفظ البطاقة","Save flashcard")}</button>
+        </div>
+      `;
+      $$("[data-fcs]").forEach(b=>b.onclick=()=>{_fcSubj=b.dataset.fcs;_fcIdx=0;_fcFlip=false;drawTab()});
+      if($("#fcFlip"))$("#fcFlip").onclick=()=>{_fcFlip=!_fcFlip;drawTab()};
+      if($("#fcPrev"))$("#fcPrev").onclick=()=>{_fcIdx=(_fcIdx-1+pool.length)%pool.length;_fcFlip=false;drawTab()};
+      if($("#fcNext"))$("#fcNext").onclick=()=>{_fcIdx=(_fcIdx+1)%pool.length;_fcFlip=false;drawTab()};
+      if($("#fcMaster"))$("#fcMaster").onclick=()=>{const nx=sp?sp.recordFlashcardReview(prog,card.id,"mastered",Date.now()):prog;ls.set(fcProgKey,JSON.stringify(nx));if(pool.length)_fcIdx=(_fcIdx+1)%pool.length;_fcFlip=false;drawTab()};
+      if($("#fcReview"))$("#fcReview").onclick=()=>{const nx=sp?sp.recordFlashcardReview(prog,card.id,"review",Date.now()):prog;ls.set(fcProgKey,JSON.stringify(nx));if(pool.length)_fcIdx=(_fcIdx+1)%pool.length;_fcFlip=false;drawTab()};
+      $("#fcAdd").onclick=()=>{const q=$("#fcNewQ").value.trim(),a=$("#fcNewA").value.trim();if(!q||!a){toast(L("اكتب السؤال والإجابة","Enter both question and answer"));return}const list=getArr(fcCustomKey);list.unshift({id:"fc_u_"+Date.now(),subject:"custom",subjectLabel:L("بطاقاتي","My cards"),front:q.slice(0,250),back:a.slice(0,600)});ls.set(fcCustomKey,JSON.stringify(list.slice(0,100)));_fcSubj="custom";_fcIdx=0;_fcFlip=false;toast(L("تمت إضافة البطاقة","Flashcard added"));drawTab()};
+      return;
+    }
+
+    if(_hubTab==="planner"){
+      const tasks=getArr(planKey);
+      const goal=Number(ls.get(goalKey))||60;
+      const study=getObj("dw_study");
+      const sum=sp?sp.computePlannerSummary(tasks,study,goal,Date.now()):{totalTasks:tasks.length,doneTasks:0,todayMinutes:0,weekMinutes:0,goalMinutes:goal,dailyPercent:0};
+      const enr=window.DWCourseAlerts?window.DWCourseAlerts.getEnrolledCourses(CS,SUBS,P):[];
+      hb.innerHTML=`
+        <div class="card">
+          <div class="lab">${L("الهدف اليومي للمذاكرة","Daily study target")}</div>
+          <div class="chips" style="margin-bottom:10px">${[30,60,90,120].map(m=>`<button class="chip ${goal===m?"on":""}" data-goal="${m}">${m} ${L("د","min")}</button>`).join("")}</div>
+          <div style="display:flex;justify-content:space-between;font-weight:700;font-size:13.5px;margin-bottom:5px">
+            <span>${L("مذاكرة اليوم","Today")}: ${sum.todayMinutes} / ${sum.goalMinutes} ${L("دقيقة","min")}</span>
+            <span>${sum.dailyPercent}%</span>
+          </div>
+          <div class="bar${sum.goalMet?" full":""}"><i style="width:${sum.dailyPercent}%"></i></div>
+          <div class="calc-res">
+            <div class="calc-box"><b>${sum.weekMinutes}</b><small>${L("دقائق آخر 7 أيام","Last 7 days (min)")}</small></div>
+            <div class="calc-box"><b>${sum.doneTasks} / ${sum.totalTasks}</b><small>${L("مهام الخطة المنجزة","Planner tasks done")}</small></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="lab">${L("أضف مهمة مذاكرة ليومك","Add a study task")}</div>
+          <input class="fi" id="plT" placeholder="${L("مثال: مراجعة الفصل الثاني فسيولوجي","e.g. Review Physiology Ch. 2")}">
+          ${enr.length?`<select class="fi" id="plC"><option value="">${L("مرتبطة بدورة (اختياري)","Course link (optional)")}</option>${enr.map(c=>`<option value="${esc(lang==="ar"?c.title:(c.titleEn||c.title))}">${esc(lang==="ar"?c.title:(c.titleEn||c.title))}</option>`).join("")}</select>`:""}
+          <button class="btn gold" id="plAdd">${L("إضافة للخطة","Add to planner")}</button>
+        </div>
+        ${tasks.length?tasks.map(tk=>`<div class="item" style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+          <label class="agree" style="margin:0;flex:1"><input type="checkbox" data-plt="${esc(tk.id)}" ${tk.done?"checked":""}><span class="box"></span><span style="${tk.done?"text-decoration:line-through;opacity:.65":""}"><b>${esc(tk.title)}</b>${tk.course?`<br><small>${esc(tk.course)}</small>`:""}</span></label>
+          <button class="rm" data-pld="${esc(tk.id)}">${L("حذف","Delete")}</button>
+        </div>`).join(""):`<div class="empty">${L("ابدأ بإضافة أول مهمة مذاكرة لليوم.","Add your first study goal for today.")}</div>`}
+      `;
+      $$("[data-goal]").forEach(b=>b.onclick=()=>{ls.set(goalKey,String(b.dataset.goal));drawTab()});
+      $("#plAdd").onclick=()=>{const tx=$("#plT").value.trim();if(!tx){toast(L("اكتب اسم المهمة","Enter task title"));return}const list=getArr(planKey);list.unshift({id:"pt_"+Date.now(),title:tx.slice(0,120),course:$("#plC")?$("#plC").value:"",done:false,at:Date.now()});ls.set(planKey,JSON.stringify(list.slice(0,80)));drawTab()};
+      $$("[data-plt]").forEach(cb=>cb.onchange=()=>{const list=getArr(planKey).map(x=>x.id===cb.dataset.plt?{...x,done:cb.checked}:x);ls.set(planKey,JSON.stringify(list));drawTab()});
+      $$("[data-pld]").forEach(b=>b.onclick=()=>{const list=getArr(planKey).filter(x=>x.id!==b.dataset.pld);ls.set(planKey,JSON.stringify(list));drawTab()});
+      return;
+    }
+
+    if(_hubTab==="calc"){
+      if(!_gpaRows){
+        _gpaRows=[
+          {name:L("التشريح البيطري","Vet Anatomy"),credits:3,gradePoints:4.0},
+          {name:L("الفسيولوجي","Physiology"),credits:3,gradePoints:3.7},
+          {name:L("الكيمياء الحيوية","Biochemistry"),credits:2,gradePoints:3.3}
+        ];
+      }
+      const grades=[["A+ (4.0)",4.0],["A (3.7)",3.7],["B+ (3.3)",3.3],["B (3.0)",3.0],["C+ (2.7)",2.7],["C (2.3)",2.3],["D+ (2.0)",2.0],["D (1.5)",1.5],["F (0.0)",0]];
+      const gpaRes=sp?sp.calculateGPA(_gpaRows,lang):{gpaText:"0.00",percentage:0,totalCredits:0,label:""};
+      hb.innerHTML=`
+        <div class="card">
+          <div class="lab">${L("حاسبة المعدل التراكمي (GPA)","GPA Calculator (4.0 Scale)")}</div>
+          <div id="gpaList">${_gpaRows.map((r,idx)=>`<div class="gpa-row">
+            <input class="fi" data-gn="${idx}" value="${esc(r.name)}" placeholder="${L("المادة","Course")}">
+            <input class="fi" type="number" min="1" max="10" data-gc="${idx}" value="${esc(r.credits)}" placeholder="${L("ساعات","Cr")}">
+            <select class="fi" data-gg="${idx}">${grades.map(g=>`<option value="${g[1]}" ${Number(r.gradePoints)===g[1]?"selected":""}>${g[0]}</option>`).join("")}</select>
+            <button class="rm" data-gr="${idx}" type="button">×</button>
+          </div>`).join("")}</div>
+          <button class="btn ghost" id="gpaAdd" style="margin-top:4px">${L("+ إضافة مادة","+ Add course")}</button>
+          <div class="calc-res" id="gpaOut">
+            <div class="calc-box"><b>${esc(gpaRes.gpaText)}</b><small>GPA / 4.00</small></div>
+            <div class="calc-box"><b>${gpaRes.percentage}%</b><small>${esc(gpaRes.label)}</small></div>
+            <div class="calc-box"><b>${gpaRes.totalCredits}</b><small>${L("إجمالي الساعات","Total credits")}</small></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="lab">${L("حاسبة المحاليل الوريدية البيطرية (IV Fluids)","Veterinary IV Fluid Rate Calculator")}</div>
+          <input class="fi" id="flW" type="number" inputmode="decimal" dir="ltr" placeholder="${L("وزن الحيوان (كجم)","Body weight (kg)")}">
+          <input class="fi" id="flD" type="number" inputmode="decimal" dir="ltr" placeholder="${L("نسبة الجفاف % (0 إلى 12)","Dehydration % (0 - 12)")}" value="5">
+          <input class="fi" id="flM" type="number" inputmode="decimal" dir="ltr" placeholder="${L("الصيانة اليومية (مل/كجم/يوم - الافتراضي 50)","Maintenance (mL/kg/day - default 50)")}" value="50">
+          <input class="fi" id="flL" type="number" inputmode="decimal" dir="ltr" placeholder="${L("فاقد مستمر إضافي (مل/يوم)","Ongoing loss (mL/day)")}" value="0">
+          <select class="fi" id="flG"><option value="20">${L("جهاز محاليل قياسي (20 نقطة/مل)","Standard set (20 drops/mL)")}</option><option value="60">${L("جهاز أطفال/ميكرو (60 نقطة/مل)","Microdrip set (60 drops/mL)")}</option></select>
+          <button class="btn gold" id="flCalc">${L("احسب معدل التقطير","Calculate IV rate")}</button>
+          <div id="flOut"></div>
+          <p class="small">${L("للتدريب والأغراض التعليمية فقط. التزم بتوجيهات الطبيب المشرف.","For study & educational training only. Always confirm clinically.")}</p>
+        </div>
+      `;
+      const syncGpa=()=>{
+        const r=sp?sp.calculateGPA(_gpaRows,lang):{gpaText:"0.00",percentage:0,totalCredits:0,label:""};
+        const out=$("#gpaOut");if(out)out.innerHTML=`<div class="calc-box"><b>${esc(r.gpaText)}</b><small>GPA / 4.00</small></div><div class="calc-box"><b>${r.percentage}%</b><small>${esc(r.label)}</small></div><div class="calc-box"><b>${r.totalCredits}</b><small>${L("إجمالي الساعات","Total credits")}</small></div>`;
+      };
+      $$("[data-gn]").forEach(el=>el.oninput=()=>{_gpaRows[+el.dataset.gn].name=el.value});
+      $$("[data-gc]").forEach(el=>el.oninput=()=>{_gpaRows[+el.dataset.gc].credits=+el.value;syncGpa()});
+      $$("[data-gg]").forEach(el=>el.onchange=()=>{_gpaRows[+el.dataset.gg].gradePoints=+el.value;syncGpa()});
+      $$("[data-gr]").forEach(b=>b.onclick=()=>{if(_gpaRows.length>1){_gpaRows.splice(+b.dataset.gr,1);drawTab()}});
+      $("#gpaAdd").onclick=()=>{_gpaRows.push({name:L("مادة جديدة","New course"),credits:2,gradePoints:3.0});drawTab()};
+      $("#flCalc").onclick=()=>{
+        const res=sp?sp.calculateFluidRate({weightKg:+$("#flW").value,dehydrationPct:+$("#flD").value,maintenanceMlKgDay:+$("#flM").value,ongoingLossMl:+$("#flL").value,dropFactor:+$("#flG").value}):{ok:false};
+        if(!res.ok){$("#flOut").innerHTML=`<div class="stat err">${L("أدخل وزن الحيوان برقم صحيح أكبر من صفر","Enter a valid body weight > 0 kg")}</div>`;return}
+        $("#flOut").innerHTML=`<div class="calc-res"><div class="calc-box"><b>${res.mlPerHour} mL/hr</b><small>${L("المعدل بالساعة","Hourly rate")}</small></div><div class="calc-box"><b>${res.dropsPerMin} gtt/min</b><small>${L("عدد النقاط بالدقيقة","Drops / min")}</small></div><div class="calc-box"><b>${res.total24h} mL</b><small>${L("إجمالي 24 ساعة","24h total volume")}</small></div></div>`;
+      };
+      return;
+    }
+
+    const notes=getArr(notesKey);
+    hb.innerHTML=`
+      <div class="card">
+        <div class="lab">${L("أضف ملاحظة دراسية جديدة","Add a study note")}</div>
+        <input class="fi" id="ntT" placeholder="${L("عنوان الملاحظة أو اسم المادة","Note title or subject")}">
+        <textarea class="fi" id="ntB" rows="3" placeholder="${L("اكتب تلخيصًا، جرعة مهمة، أو نقطة امتحان...","Write a summary, key dosage, or exam point...")}"></textarea>
+        <button class="btn gold" id="ntAdd">${L("حفظ الملاحظة","Save note")}</button>
+      </div>
+      ${notes.length?notes.map(n=>`<div class="item"><div class="nm">${esc(n.title)}</div><div class="tx">${esc(n.body)}</div><div class="small">${fd(n.at)}</div><div class="acts"><button class="pl" data-ntc="${esc(n.id)}">${t("copy")}</button><button class="rm" data-ntd="${esc(n.id)}">${L("حذف","Delete")}</button></div></div>`).join(""):`<div class="empty">${L("مفكرتك فارغة حاليًا — احفظ ملاحظاتك السريعة هنا.","Your notebook is empty — save quick study notes here.")}</div>`}
+    `;
+    $("#ntAdd").onclick=()=>{const ti=$("#ntT").value.trim(),bd=$("#ntB").value.trim();if(!ti||!bd){toast(L("اكتب العنوان والمحتوى","Enter title and note"));return}const list=getArr(notesKey);list.unshift({id:"nt_"+Date.now(),title:ti.slice(0,100),body:bd.slice(0,2000),at:Date.now()});ls.set(notesKey,JSON.stringify(list.slice(0,120)));toast(L("تم حفظ الملاحظة","Note saved"));drawTab()};
+    $$("[data-ntc]").forEach(b=>b.onclick=()=>{const it=getArr(notesKey).find(x=>x.id===b.dataset.ntc);if(it)try{navigator.clipboard.writeText(it.title+"\n"+it.body);toast(t("copied"))}catch(e){}});
+    $$("[data-ntd]").forEach(b=>b.onclick=()=>{ls.set(notesKey,JSON.stringify(getArr(notesKey).filter(x=>x.id!==b.dataset.ntd)));drawTab()});
+  }
+  drawTab();
+}
 async function loadPrayer(c){const box=$("#tp");try{const key="dw_pr_"+c[0]+new Date().toDateString();let d=JSON.parse(ls.get(key)||"null");if(!d){const j=await jf("https://api.aladhan.com/v1/timingsByCity?city="+encodeURIComponent(c[0])+"&country=Egypt&method=5");d={t:j.data.timings,h:j.data.date.hijri};ls.set(key,JSON.stringify(d))}
 const now=new Date(),mins=x=>{const[h,m]=String(x).slice(0,5).split(":").map(Number);return h*60+m},cur=now.getHours()*60+now.getMinutes();let nx=PN.find(p=>mins(d.t[p[0]])>cur&&p[0]!=="Sunrise")||PN[0];
 box.innerHTML=`<div class="lab">${L("مواقيت الصلاة","Prayer times")} — ${esc(lang==="ar"?c[1]:c[2])}</div><div class="small">${esc(d.h.day+" "+(lang==="ar"?d.h.month.ar:d.h.month.en)+" "+d.h.year)}</div><div class="ptg">${PN.map(p=>`<div class="${nx[0]===p[0]?"on":""}"><small>${lang==="ar"?p[1]:p[2]}</small><b dir="ltr">${esc(String(d.t[p[0]]).slice(0,5))}</b></div>`).join("")}</div>`}catch(e){box.innerHTML+=`<div class="stat err">${L("تعذر تحميل المواقيت","Could not load prayer times")}</div>`}}

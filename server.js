@@ -357,6 +357,11 @@ app.get('/progress-chart.js', (_req, res) => {
   res.sendFile(path.join(__dirname, 'app', 'progress-chart.js'));
 });
 
+app.get('/student-pro.js', (_req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
+  res.sendFile(path.join(__dirname, 'app', 'student-pro.js'));
+});
+
 app.get('/api/releases', async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   const force = req.query && req.query.force === '1';

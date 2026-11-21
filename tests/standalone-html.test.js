@@ -22,6 +22,7 @@ test('buildStandaloneHtml inlines all local scripts cleanly with valid JS syntax
   assert.ok(html.includes('DWCourseFeatures'), 'Expected DWCourseFeatures to be inlined');
   assert.ok(html.includes('DWStudentBadges'), 'Expected DWStudentBadges to be inlined');
   assert.ok(html.includes('DWProgressChart'), 'Expected DWProgressChart to be inlined');
+  assert.ok(html.includes('DWStudentPro'), 'Expected DWStudentPro to be inlined');
 
   const scriptSrcs = [...html.matchAll(/<script[^>]*\bsrc=["']([^"']+)["']/gi)].map((m) => m[1]);
   const nonHttpsSrcs = scriptSrcs.filter((src) => !/^https:\/\//i.test(src));
@@ -142,7 +143,8 @@ test('buildDesktopZip packages updated Desktop repo files, NSIS graphics/script,
     'app/course-alerts.js',
     'app/course-features.js',
     'app/student-badges.js',
-    'app/progress-chart.js'
+    'app/progress-chart.js',
+    'app/student-pro.js'
   ]) {
     assert.ok(files.includes(reqFile), `Expected ${reqFile} in desktop zip`);
   }
