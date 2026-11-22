@@ -18,8 +18,7 @@
     "dist": "electron-builder"
   },
   "dependencies": {
-    "express": "^5.3.0",
-    "@simplewebauthn/server": "13.3.2"
+    "express": "^5.3.0"
   },
   "devDependencies": {},
   "build": {
@@ -53,14 +52,7 @@
       "desktop-widget-preload.js",
       "desktop-widget-renderer.js",
       "desktop-widget.html",
-      "desktop-widget.css",
-      "auth-guard.js",
-      "windows-hello.js",
-      "device-auth-challenges.js",
-      "windows-hello-gate.js",
-      "hello-gate-preload.js",
-      "hello-gate-renderer.js",
-      "hello-gate.html"
+      "desktop-widget.css"
     ],
     "win": {
       "target": [
@@ -72,13 +64,7 @@
         }
       ],
       "icon": "build/icon.ico",
-      "artifactName": "DrWael-Setup.${ext}",
-      "extraResources": [
-        {
-          "from": "build/native/windows-hello.exe",
-          "to": "native/windows-hello.exe"
-        }
-      ]
+      "artifactName": "DrWael-Setup.${ext}"
     },
     "nsis": {
       "oneClick": false,

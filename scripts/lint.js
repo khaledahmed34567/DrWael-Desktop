@@ -7,7 +7,7 @@ for(const dir of dirs)for(const entry of fs.readdirSync(path.join(root,dir),{wit
  const file=path.join(root,dir,entry.name),check=spawnSync(process.execPath,['--check',file],{encoding:'utf8'});
  if(check.status!==0){process.stderr.write(check.stderr||check.stdout||'Syntax check failed\n');process.exit(1)}count++;
 }
-for(const file of ['app/index.html','desktop-widget.html','store-gate.html','dialog.html','hello-gate.html']){
+for(const file of ['app/index.html','desktop-widget.html','store-gate.html','dialog.html']){
  const html=fs.readFileSync(path.join(root,file),'utf8');
  for(const match of html.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/gi))new vm.Script(match[1],{filename:file});
 }

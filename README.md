@@ -57,13 +57,11 @@ node --test tests/*.test.js
 يفتح تسجيل الدخول بجوجل المتصفح الافتراضي ثم يعيد الجلسة إلى التطبيق. في Firebase Authentication، يجب أن يكون `localhost` ضمن النطاقات المسموح بها. إعدادات عميل Firebase ليست كلمات مرور أو مفاتيح خادم سرية. لا تضع أسرار الخادم في `config.json` أو حزمة التطبيق.
 
 
-## Windows verification and release requirements
+## Release requirements
 
-- Windows10 version1903 or later, with Windows Hello configured, is required for the new Windows entry gate. Unsupported or unconfigured devices cannot open the app without verification. The app never receives or saves the Windows PIN.
-- Verification is required at startup, after Windows lock/sleep, and before payment submission. A changed account or payment context invalidates a pending confirmation.
 - The existing Microsoft Store update check remains first. Store update errors and offline checks still block entry under the selected policy.
 - The account-wide six-calendar-month Pro offer starts only when the new Microsoft Store update is available for download, not when a GitHub build or Store submission is created. Its start/end come from server policy. Paid courses are excluded, and longer applicable existing grants are preserved.
 - Missing or unverified promotion policy pauses new Pro purchases. It does not erase saved themes, notes, balances, purchases or permanent access.
-- macOS payment verification continues to use Touch ID. Unsupported Linux payment verification fails closed. The mandatory Windows Hello gate is Windows-specific.
 
-Local validation includes unit/security tests, source checks and a sandboxed Electron gate smoke with a synthetic verifier. A synthetic verifier is not a real Windows Hello or Store-installed upgrade test. Those acceptance checks still need a supported Windows device.
+
+The default interface retains the original bundled fonts and segmented Student Hub layout. Windows Hello is not required or invoked. Existing in-app PIN settings and notes are retained. The Microsoft Store startup update gate is unchanged.

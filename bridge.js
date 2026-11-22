@@ -105,14 +105,13 @@ $('b').onclick=async()=>{try{
     try {
       switch (m.a) {
         case 'ver': return ok({ v: d.version });
-        case 'helloSettings': if(d.helloSettings)d.helloSettings();return ok();
-        case 'auth': return { id, ok: d.touchId ? (await d.touchId(String(m.why || 'auth'),m.context)) === true : false };
+        case 'auth': return d.touchId ? { id, ok: !!(await d.touchId(String(m.why || 'auth'))) } : ok();
         case 'google': {
           const r = await google();
           return Object.assign({ id }, r);
         }
-        case 'session': if(d.session)d.session(m.uid);return ok();
-        case 'logout': if(d.logout)d.logout();return ok();
+        case 'session': return ok();
+        case 'logout': return ok();
         case 'prefs': return ok();
         case 'update': if (d.checkUpdate) d.checkUpdate(); return ok();
         case 'save': {

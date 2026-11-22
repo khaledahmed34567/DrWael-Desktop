@@ -12,10 +12,6 @@ const { createDesktopHandler } = require('./desktop-http');
 const { trustedIpc, allowPermission } = require('./desktop-security');
 const { enforceStoreStartup } = require('./store-startup');
 const { createDesktopWidget } = require('./desktop-widget');
-const { requestDeviceVerification } = require('./auth-guard');
-const { createWindowsHello } = require('./windows-hello');
-const { createHelloGate, hwnd } = require('./windows-hello-gate');
-let hello=null,helloGate=null,deviceUnlocked=process.platform!=='win32',activeDeviceAccount='windows-device';
 let studyWidget = null;
 
 const CFG = JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json'), 'utf8'));
@@ -236,7 +232,7 @@ ipcMain.on('dlg:size', (e, h) => {
   p.w.show();
 });
 
-const trusted = e => deviceUnlocked && trustedIpc(e, win, PORT);
+const trusted = e => trustedIpc(e, win, PORT);
 
 ipcMain.on('dw:dialog', (e, o) => {
   if (!trusted(e) || !o || typeof o !== 'object') { e.returnValue = null; return; }
@@ -365,9 +361,8 @@ function applyProtection() {
   for (const bw of BrowserWindow.getAllWindows()) protectWindow(bw);
 }
 
-async function showWin() {
+function showWin() {
   if (!win) return;
-  if(process.platform==='win32'&&!deviceUnlocked){if(!helloGate||!await helloGate.ensure())return;deviceUnlocked=true;}
   if (win.isMinimized()) win.restore();
   applyProtection();
   win.show();
@@ -389,10 +384,10 @@ function createWindow() {
     const icImg = appIcon();
     if (!icImg.isEmpty()) try { win.setIcon(icImg); } catch (e) { /* تجاهل */ }
     applyProtection();
-    if(deviceUnlocked)win.show();
+    win.show();
   });
-  win.on('show', ()=>{if(!deviceUnlocked){win.hide();return;}applyProtection();});
-  win.on('restore', ()=>{if(!deviceUnlocked){win.hide();return;}applyProtection();});
+  win.on('show', applyProtection);
+  win.on('restore', applyProtection);
   win.on('focus', () => {
     applyProtection();
     if (!win.isDestroyed()) win.webContents.send('dw:shield', false);
@@ -404,7 +399,7 @@ function createWindow() {
     unregisterShotShortcuts();
   });
   setTimeout(() => {
-    if (deviceUnlocked && win && !win.isDestroyed() && !win.isVisible()) {
+    if (win && !win.isDestroyed() && !win.isVisible()) {
       applyProtection();
       win.show();
     }
@@ -490,13 +485,6 @@ app.whenReady().then(async () => {
     return;
   }
 
-  if(process.platform==='win32'){
-    hello=createWindowsHello({filePath:path.join(app.getPath('userData'),'hello-public-credential.json'),helperPath:app.isPackaged?path.join(process.resourcesPath,'native','windows-hello.exe'):path.join(__dirname,'build','native','windows-hello.exe')});
-    helloGate=createHelloGate({BrowserWindow,ipcMain,shell,app,hello});
-    const lockDevice=()=>{deviceUnlocked=false;helloGate.close();if(studyWidget)studyWidget.clear();for(const pending of dlgPending.values())pending.fin(false);if(win&&!win.isDestroyed())win.hide();};
-    powerMonitor.on('lock-screen',lockDevice);powerMonitor.on('suspend',lockDevice);
-    try{if(!await helloGate.ensure()){app.quit();return}deviceUnlocked=true}catch(_){app.quit();return}
-  }
   fetchSession = session.fromPartition('libfetch');
   const ses = session.defaultSession;
   ses.setPermissionRequestHandler((wc, perm, cb, details) => cb(allowPermission(wc, perm, details, win, PORT)));
@@ -512,7 +500,7 @@ app.whenReady().then(async () => {
     version: app.getVersion(),
     now: () => Date.now(),
     notify: (t, b) => {
-      if (!deviceUnlocked || !Notification.isSupported()) return;
+      if (!Notification.isSupported()) return;
       const n = new Notification({ title: t || APP_NAME, body: b || '', icon: appIcon() });
       n.on('click', showWin);
       n.show();
@@ -524,10 +512,12 @@ app.whenReady().then(async () => {
       return true;
     },
     openExternal: (url) => shell.openExternal(url),
-    helloSettings:()=>shell.openExternal('ms-settings:signinoptions').catch(()=>{}),
-    touchId: (why,context) => requestDeviceVerification({platform:process.platform,windowsHello:async()=>{if(!deviceUnlocked||!hello||!win||win.isDestroyed()||why!=='pay')return false;return hello.verify({hwnd:hwnd(win),accountId:activeDeviceAccount,purpose:'payment',context:{why,transaction:context??null}})},canTouchID:()=>systemPreferences.canPromptTouchID(),touchID:reason=>systemPreferences.promptTouchID(reason),reason:why}),
-    session:uid=>{const next=String(uid||'windows-device').slice(0,256);if(next!==activeDeviceAccount){activeDeviceAccount=next;if(hello)hello.clear();}},
-    logout:()=>{activeDeviceAccount='windows-device';if(hello)hello.clear();},
+    touchId: async (why) => {
+      if (process.platform === 'darwin' && systemPreferences.canPromptTouchID()) {
+        try { await systemPreferences.promptTouchID(why); return true; } catch (e) { return false; }
+      }
+      return true; // على ويندوز/لينكس تحمي الصفحة نفسها برمز PIN
+    },
     setIcon: (name) => {
       const img = nativeImage.createFromPath(iconPath(name));
       if (img.isEmpty()) return false;

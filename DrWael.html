@@ -602,7 +602,7 @@ body.dw-blur>:not(#dw-shield){filter:blur(24px)}
 .calc-box small{font-size:11.5px;color:var(--sub)}
 
 
-:root{--sub:var(--mute);--brd:var(--line)}
+
 html[data-theme=dark]{color-scheme:dark}
 html[data-theme=dark] body{background:var(--bg);color:var(--ink)}
 html[data-theme=dark] :is(.fi,.srch,.comp,select,textarea,.trow,.btn.ghost,.thb,.icb,.chip,.fc-card,.calc-box,.hub-nav,.hub-metric){background:var(--card);color:var(--ink);border-color:var(--line)}
@@ -620,8 +620,8 @@ html[data-theme=dark] .hub-intro .btn.ghost{background:#36485e;color:#fff}
 html.dw-motion-off *,html.dw-motion-off *::before,html.dw-motion-off *::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
 /* Organized study workspace. No motion when the system or student requests less. */
 .hub-layout{display:grid;grid-template-columns:200px minmax(0,1fr);gap:20px;align-items:start}
-.hub-nav{display:grid;gap:6px;position:sticky;top:18px;padding:12px;border:1px solid var(--brd);border-radius:18px;background:var(--card,#fff)}
-.hub-nav small{color:var(--sub);padding:10px 10px 3px;font-size:11px;letter-spacing:.04em}
+.hub-nav{display:grid;gap:6px;position:sticky;top:18px;padding:12px;border:1px solid var(--brd,var(--line));border-radius:18px;background:var(--card,#fff)}
+.hub-nav small{color:var(--sub,var(--mute));padding:10px 10px 3px;font-size:11px;letter-spacing:.04em}
 .hub-nav button{text-align:start;border:0;border-radius:11px;background:transparent;color:var(--ink);padding:11px 12px;font:inherit;cursor:pointer;transition:background .16s ease,transform .16s ease}
 .hub-nav button:hover{background:var(--bg);transform:translateY(-1px)}
 .hub-nav button.on{background:var(--ink);color:var(--bg);font-weight:800}
@@ -629,9 +629,9 @@ html.dw-motion-off *,html.dw-motion-off *::before,html.dw-motion-off *::after{an
 .hub-intro{padding:24px;border-radius:20px;background:linear-gradient(120deg,#15243f,#33496b);color:#fff;margin-bottom:16px}
 .hub-intro h3{margin:6px 0 10px;font-size:25px;color:#fff}.hub-intro p{margin:0;color:#e0e9f5;line-height:1.7}
 .hub-kicker{font-size:11px;letter-spacing:.06em;opacity:.8}.hub-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:18px}
-.hub-metric{padding:17px 12px;background:var(--card,#fff);border:1px solid var(--brd);border-radius:16px}.hub-metric b{display:block;font-size:26px;font-variant-numeric:tabular-nums}.hub-metric small{color:var(--sub)}
+.hub-metric{padding:17px 12px;background:var(--card,#fff);border:1px solid var(--brd,var(--line));border-radius:16px}.hub-metric b{display:block;font-size:26px;font-variant-numeric:tabular-nums}.hub-metric small{color:var(--sub,var(--mute))}
 .hub-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.hub-actions .btn{width:auto;margin:0;min-width:110px}.hub-two{display:grid;grid-template-columns:1.2fr 1fr;gap:14px}.hub-two>.card{margin:0 0 14px}
-.hub-task{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--brd);overflow-wrap:anywhere}.hub-task:last-child{border:0}.hub-task i{height:7px;width:7px;flex:none;border-radius:100%;background:var(--gold,#bb8f42)}
+.hub-task{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--brd,var(--line));overflow-wrap:anywhere}.hub-task:last-child{border:0}.hub-task i{height:7px;width:7px;flex:none;border-radius:100%;background:var(--gold,#bb8f42)}
 .hub-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}.hub-toolbar .fi{flex:1;min-width:160px;margin:0}.hub-toolbar select.fi{flex:0 1 160px}
 html[data-theme=dark] #gw,html[data-theme=dark] #okov{background:var(--bg);color:var(--ink)}
 html[data-theme=dark] .gcard,html[data-theme=dark] .gm button{background:var(--card);color:var(--ink)}
@@ -4143,7 +4143,7 @@ function lockUI(){clearStudyWidget();if($("#lockov"))return;const d=document.cre
 $("#lu").onclick=async()=>{if(await sha(U.uid+nd($("#lp").value))===ls.get(lk()))d.remove();else $("#lm").innerHTML=`<div class="stat err">${t("wrongPin")}</div>`};$("#lp").onkeydown=e=>{if(e.key==="Enter")$("#lu").click()};$("#lo2").onclick=()=>{ls.set(lk(),"");ls.set(lk()+"_bio","");d.remove();nreq("logout");auth.signOut().then(()=>{U=P=null;show("auth")})};setTimeout(()=>$("#lp").focus(),250);
 if($("#lb"))$("#lb").onclick=async()=>{try{await navigator.credentials.get({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),allowCredentials:[{id:ub(ls.get(lk()+"_bio")),type:"public-key"}],userVerification:"required",timeout:60000}});d.remove()}catch(e){}}}
 document.addEventListener("visibilitychange",()=>{if(document.hidden)hiddenAt=Date.now();else if(U&&hiddenAt&&Date.now()-hiddenAt>3e4)lockCheck()});
-function vLock(){if(DESK&&window.DWNative.platform==='win32'){sub(t('lockH'),`<div class="card"><h2>Windows Hello</h2><p>${L('القفل إلزامي عند فتح التطبيق وبعد قفل ويندوز أو السكون. التحقق يتم من خلال PIN أو بصمة الجهاز، وليس رقمًا يحفظه التطبيق.','The lock is required at startup and after Windows lock or sleep. Verification uses Windows Hello, not an app-stored PIN.')}</p><button class="btn" id="helloSetup">${L('إعداد Windows Hello','Windows Hello settings')}</button></div>`);$('#helloSetup').onclick=()=>nreq('helloSettings');return;}const on=!!ls.get(lk());sub(t("lockH"),`<div class="card">${on?`<div class="stat ok">${t("on")}</div>`:""}<input class="fi" id="np" type="password" inputmode="numeric" maxlength="8" placeholder="${t("pin")}"><button class="btn gold" id="sp">${t("setPin")}</button>${navigator.credentials&&window.PublicKeyCredential?`<button class="btn ghost" id="sbio" style="margin-top:8px">${t("bio")}</button>`:""}${on?`<button class="btn ghost" id="so" style="margin-top:8px">${t("off")}</button>`:""}<div id="lmx"></div></div>`);
+function vLock(){const on=!!ls.get(lk());sub(t("lockH"),`<div class="card">${on?`<div class="stat ok">${t("on")}</div>`:""}<input class="fi" id="np" type="password" inputmode="numeric" maxlength="8" placeholder="${t("pin")}"><button class="btn gold" id="sp">${t("setPin")}</button>${!DESK&&navigator.credentials&&window.PublicKeyCredential?`<button class="btn ghost" id="sbio" style="margin-top:8px">${t("bio")}</button>`:""}${on?`<button class="btn ghost" id="so" style="margin-top:8px">${t("off")}</button>`:""}<div id="lmx"></div></div>`);
 $("#sp").onclick=async()=>{const v=nd($("#np").value);if(!/^\d{4,8}$/.test(v)){$("#lmx").innerHTML=`<div class="stat err">${t("pin")}</div>`;return}ls.set(lk(),await sha(U.uid+v));vLock()};
 if($("#so"))$("#so").onclick=async()=>{const v=nd($("#np").value);if(v&&await sha(U.uid+v)===ls.get(lk())){ls.set(lk(),"");ls.set(lk()+"_bio","");vLock()}else $("#lmx").innerHTML=`<div class="stat err">${t("wrongPin")}</div>`};
 if($("#sbio"))$("#sbio").onclick=async()=>{try{if(!ls.get(lk()))throw 0;const c=await navigator.credentials.create({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),rp:{name:"Dr. Wael"},user:{id:crypto.getRandomValues(new Uint8Array(16)),name:P.email,displayName:P.nameEn},pubKeyCredParams:[{type:"public-key",alg:-7},{type:"public-key",alg:-257}],authenticatorSelection:{authenticatorAttachment:"platform",userVerification:"required"},timeout:60000}});ls.set(lk()+"_bio",b64(c.rawId));$("#lmx").innerHTML=`<div class="stat ok">${t("on")}</div>`}catch(e){$("#lmx").innerHTML=`<div class="stat err">${t("setPin")}</div>`}};
@@ -4533,8 +4533,8 @@ function watchOk(){db.collection("payments").where("uid","==",U.uid).onSnapshot(
 function showOk(p){if($("#okov"))return;const d=document.createElement("div");d.id="okov";d.innerHTML=`<div class="gok"><img src="${OKI}" alt=""><h2>${t("okT")}</h2><p class="nm">${esc(p.title)} — ${esc(p.amount)} ${t("egp")}</p><p class="small">${t("okS")}</p><button class="gpay" id="od" style="width:100%">${t("invP")}</button><button class="btn ghost" id="oc" style="width:100%">${t("close")}</button></div>`;document.body.appendChild(d);PAYS[p.id]=p;
 const seen=()=>db.doc("payments/"+p.id).update({seen:true}).catch(()=>{});$("#oc").onclick=()=>{seen();d.remove()};$("#od").onclick=()=>{seen();d.remove();vMyPays()}}
 /* ---------- forced app lock ---------- */
-function lockCheck(){if(DESK&&window.DWNative.platform==='win32')return;if(NAT&&!DESK)return;if(ls.get(lk()))lockUI()}
-function lockSetup(){clearStudyWidget();if($("#lockov"))return;const d=document.createElement("div");d.id="lockov";d.className="screen";d.innerHTML=`<div class="glow"></div><img class="logo-sm" src="${LOGO[lang]}" alt=""><div class="abox" style="margin-top:16px"><h2 style="margin-bottom:6px">${t("newPin")}</h2><p class="small">${t("lockReq")}</p><input class="fi" id="p1" type="password" inputmode="numeric" maxlength="8" placeholder="${t("pin")}"><input class="fi" id="p2" type="password" inputmode="numeric" maxlength="8" placeholder="${t("pin2")}"><button class="btn gold" id="ps">${t("setPin")}</button>${navigator.credentials&&window.PublicKeyCredential?`<button class="btn ghost" id="pb2" style="margin-top:8px">${t("bio")}</button>`:""}<div id="pm2"></div></div>`;document.body.appendChild(d);
+function lockCheck(){if(NAT&&!DESK)return;if(ls.get(lk()))lockUI()}
+function lockSetup(){if($("#lockov"))return;const d=document.createElement("div");d.id="lockov";d.className="screen";d.innerHTML=`<div class="glow"></div><img class="logo-sm" src="${LOGO[lang]}" alt=""><div class="abox" style="margin-top:16px"><h2 style="margin-bottom:6px">${t("newPin")}</h2><p class="small">${t("lockReq")}</p><input class="fi" id="p1" type="password" inputmode="numeric" maxlength="8" placeholder="${t("pin")}"><input class="fi" id="p2" type="password" inputmode="numeric" maxlength="8" placeholder="${t("pin2")}"><button class="btn gold" id="ps">${t("setPin")}</button>${!DESK&&navigator.credentials&&window.PublicKeyCredential?`<button class="btn ghost" id="pb2" style="margin-top:8px">${t("bio")}</button>`:""}<div id="pm2"></div></div>`;document.body.appendChild(d);
 const bad_=k=>{$("#pm2").innerHTML=`<div class="stat err">${t(k)}</div>`};
 $("#ps").onclick=async()=>{const a=$("#p1").value;if(!/^\d{4,8}$/.test(a))return bad_("pin");if(a!==$("#p2").value)return bad_("pinMis");ls.set(lk(),await sha(U.uid+a));d.remove()};
 if($("#pb2"))$("#pb2").onclick=async()=>{const a=$("#p1").value;if(!/^\d{4,8}$/.test(a)||a!==$("#p2").value)return bad_("pinMis");try{const c=await navigator.credentials.create({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),rp:{name:"Dr. Wael"},user:{id:crypto.getRandomValues(new Uint8Array(16)),name:P.email,displayName:P.nameEn},pubKeyCredParams:[{type:"public-key",alg:-7},{type:"public-key",alg:-257}],authenticatorSelection:{authenticatorAttachment:"platform",userVerification:"required"},timeout:60000}});ls.set(lk()+"_bio",b64(c.rawId));ls.set(lk(),await sha(U.uid+a));d.remove()}catch(e){bad_("err")}}}
@@ -4956,7 +4956,7 @@ if(window.__dwHost&&window.__dwHost.widgetSet){setInterval(syncStudyWidget,2000)
 /* ---------- Smart Student Hub (Flashcards, Study Planner, GPA & Fluids, Notes) ---------- */
 let _focusTick=null;
 let _plannerFilter="open",_plannerQuery="";
-let _hubTab="today",_fcSubj="all",_fcIdx=0,_fcFlip=false,_gpaRows=null;
+let _hubTab="cards",_fcSubj="all",_fcIdx=0,_fcFlip=false,_gpaRows=null;
 function vStudentHub(tab){
   if(tab)_hubTab=tab;
   const sp=window.DWStudentPro;
@@ -4966,11 +4966,17 @@ function vStudentHub(tab){
   const getObj=k=>{const o=getJSON(k,{});return o&&typeof o==="object"&&!Array.isArray(o)?o:{}};
 
   const renderTabs=()=>{
-    const groups=[
-      [L("تنظيم يومك","ORGANIZE"),[["today",L("نظرة عامة","Overview")],["planner",L("خطة المذاكرة","Study planner")],["exams",L("الامتحانات","Exams")],["focus",L("مؤقّت التركيز","Focus timer")],...(window.__dwHost&&window.__dwHost.widgetOpen?[["widget",L("ويدجيت سطح المكتب","Desktop widget")]]:[])]],
-      [L("التعلّم والمراجعة","LEARN & REVIEW"),[["cards",L("بطاقات المراجعة","Flashcards")],["notes",L("مفكرتي","Notes")],["calc",L("GPA ومحاليل","GPA & Fluids")]]]
+    const tabs=[
+      ["cards",L("البطاقات","Flashcards")],
+      ["planner",L("خطتي","Planner")],
+      ["calc",L("GPA ومحاليل","GPA & Fluids")],
+      ["notes",L("مفكرتي","Notes")],
+      ["exams",L("امتحاناتي","Exams")],
+      ["focus",L("تركيز","Focus")],
+      ["today",L("نظرة عامة","Overview")],
+      ...(window.__dwHost&&window.__dwHost.widgetOpen?[["widget",L("ويدجيت سطح المكتب","Desktop widget")]]:[])
     ];
-    return `<div class="hub-layout"><nav class="hub-nav" aria-label="${L('أدوات الطالب','Student tools')}">${groups.map(g=>`<small>${g[0]}</small>${g[1].map(x=>`<button type="button" data-ht="${x[0]}" class="${_hubTab===x[0]?'on':''}" aria-pressed="${_hubTab===x[0]}">${esc(x[1])}</button>`).join('')}`).join('')}</nav><div id="hubBody" class="hub-pane"></div></div>`;
+    return`<div class="seg" style="margin-bottom:12px;flex-wrap:wrap;gap:6px">${tabs.map(x=>`<button style="flex:1;min-width:100px" data-ht="${x[0]}" class="${_hubTab===x[0]?"on":""}">${esc(x[1])}</button>`).join("")}</div><div id="hubBody"></div>`;
   };
 
   sub(L("حقيبة الطالب الذكية","Smart Student Hub"),renderTabs());
@@ -4982,7 +4988,7 @@ function vStudentHub(tab){
     const hb=$("#hubBody");if(!hb)return;
 
     document.documentElement.classList.toggle("dw-motion-off",ls.get("dw_reduce_motion")==="1");
-    hb.classList.remove("hub-pane");void hb.offsetWidth;hb.classList.add("hub-pane");
+
     if(_hubTab==="today"){
       const snap=sp.organizerSnapshot(getArr(planKey),getArr("dw_exams_"+uid),getJSON("dw_focus_"+uid,null),Date.now());
       const ex=snap.nextExam;
