@@ -8,6 +8,9 @@ const http = require('http');
 const https = require('https');
 const crypto = require('crypto');
 const createBridge = require('./bridge');
+const { createDesktopHandler } = require('./desktop-http');
+const { trustedIpc, allowPermission } = require('./desktop-security');
+const { enforceStoreStartup } = require('./store-startup');
 
 const CFG = JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json'), 'utf8'));
 const APP_NAME = CFG.appName || 'Dr. Wael';
@@ -156,85 +159,12 @@ const isLoopback = (addr) => addr === '127.0.0.1' || addr === '::1' || addr === 
 // ------------------------------------------------------------------ خادم محلي صغير لعرض الصفحة
 function startServer() {
   return new Promise((resolve) => {
-    const srv = http.createServer(async (req, res) => {
-      try {
-        if (!isLoopback(req.socket.remoteAddress)) {
-          res.writeHead(403);
-          return res.end();
-        }
-        const u = new URL(req.url, 'http://localhost');
-        if (req.method === 'GET' && (u.pathname === '/' || u.pathname === '/index.html')) {
-          res.writeHead(200, { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' });
-          return res.end(pageHtml());
-        }
-        if (req.method === 'GET' && u.pathname === '/course-alerts.js') {
-          res.writeHead(200, { 'content-type': 'application/javascript; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' });
-          return res.end(fs.readFileSync(path.join(__dirname, 'app', 'course-alerts.js'), 'utf8'));
-        }
-        if (req.method === 'GET' && u.pathname === '/course-features.js') {
-          res.writeHead(200, { 'content-type': 'application/javascript; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' });
-          return res.end(fs.readFileSync(path.join(__dirname, 'app', 'course-features.js'), 'utf8'));
-        }
-        if (req.method === 'GET' && u.pathname === '/student-badges.js') {
-          res.writeHead(200, { 'content-type': 'application/javascript; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' });
-          return res.end(fs.readFileSync(path.join(__dirname, 'app', 'student-badges.js'), 'utf8'));
-        }
-        if (req.method === 'GET' && u.pathname === '/progress-chart.js') {
-          res.writeHead(200, { 'content-type': 'application/javascript; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' });
-          return res.end(fs.readFileSync(path.join(__dirname, 'app', 'progress-chart.js'), 'utf8'));
-        }
-        if (req.method === 'GET' && u.pathname === '/d3.min.js') {
-          const d3p = path.join(__dirname, 'node_modules', 'd3', 'dist', 'd3.min.js');
-          if (fs.existsSync(d3p)) {
-            res.writeHead(200, { 'content-type': 'application/javascript; charset=utf-8', 'cache-control': 'public, max-age=86400', 'x-content-type-options': 'nosniff' });
-            return res.end(fs.readFileSync(d3p, 'utf8'));
-          }
-        }
-        if (req.method === 'GET' && u.pathname === '/__lib') {
-          let t;
-          try { t = new URL(u.searchParams.get('u') || ''); } catch (e) { res.writeHead(400); return res.end(); }
-          if (!libAllowed(t)) { res.writeHead(403); return res.end(); }
-          if (!isCached(t.href) && !(await fetchToCache(t.href))) { res.writeHead(504); return res.end(); }
-          const f = path.join(cacheDir(), sha1(t.href));
-          res.writeHead(200, {
-            'content-type': fs.readFileSync(f + '.m', 'utf8'),
-            'access-control-allow-origin': '*',
-            'cache-control': 'public, max-age=31536000'
-          });
-          return fs.createReadStream(f).pipe(res);
-        }
-        if (req.method === 'GET' && u.pathname.startsWith('/assets/')) {
-          const assetsRoot = path.join(__dirname, 'assets');
-          const relPath = decodeURIComponent(u.pathname.slice('/assets/'.length));
-          const resolved = path.resolve(assetsRoot, relPath);
-          if ((resolved === assetsRoot || resolved.startsWith(assetsRoot + path.sep)) && fs.existsSync(resolved) && fs.statSync(resolved).isFile()) {
-            const ext = path.extname(resolved).toLowerCase();
-            const ct = ext === '.png' ? 'image/png' : ext === '.ttf' ? 'font/ttf' : ext === '.svg' ? 'image/svg+xml' : 'application/octet-stream';
-            res.writeHead(200, { 'content-type': ct, 'cache-control': 'public, max-age=86400', 'x-content-type-options': 'nosniff' });
-            return res.end(fs.readFileSync(resolved));
-          }
-        }
-        if (u.pathname === '/favicon.ico') {
-          const fav = [path.join(__dirname, 'build', 'icon.png'), iconPath('Default')].find((p) => fs.existsSync(p));
-          if (fav) {
-            res.writeHead(200, { 'content-type': 'image/png', 'cache-control': 'public, max-age=86400', 'x-content-type-options': 'nosniff' });
-            return res.end(fs.readFileSync(fav));
-          }
-          res.writeHead(204);
-          return res.end();
-        }
-        res.writeHead(404);
-        return res.end();
-      } catch (e) {
-        res.writeHead(500);
-        return res.end();
-      }
-    });
+    const srv = http.createServer(createDesktopHandler({ rootDir: __dirname, getPort: () => PORT, pageHtml, libAllowed, isCached, fetchToCache, cacheDir, sha1, iconPath }));
     srv.once('error', () => {
       // المنفذ المفضّل مشغول: نستخدم منفذًا عشوائيًا
-      srv.listen(0, () => { PORT = srv.address().port; resolve(); });
+      srv.listen(0, '127.0.0.1', () => { PORT = srv.address().port; resolve(); });
     });
-    srv.listen(CFG.preferredPort || 47831, () => { PORT = srv.address().port; resolve(); });
+    srv.listen(CFG.preferredPort || 47831, '127.0.0.1', () => { PORT = srv.address().port; resolve(); });
   });
 }
 
@@ -300,12 +230,7 @@ ipcMain.on('dlg:size', (e, h) => {
   p.w.show();
 });
 
-const trusted = (e) => {
-  try {
-    return e.senderFrame.url.startsWith('http://localhost:' + PORT + '/') ||
-           e.senderFrame.url.startsWith('http://127.0.0.1:' + PORT + '/');
-  } catch (x) { return false; }
-};
+const trusted = e => trustedIpc(e, win, PORT);
 
 ipcMain.on('dw:dialog', (e, o) => {
   if (!trusted(e) || !o || typeof o !== 'object') { e.returnValue = null; return; }
@@ -317,6 +242,7 @@ ipcMain.on('dw:dialog', (e, o) => {
 
 ipcMain.on('dw:msg', async (e, raw) => {
   if (!trusted(e) || typeof raw !== 'string' || raw.length > 60 * 1024 * 1024) return;
+  if (!bridge) return;
   const r = await bridge.handle(raw);
   if (r && !e.sender.isDestroyed()) e.sender.send('dw:reply', JSON.stringify(r));
 });
@@ -346,7 +272,7 @@ function protectWindow(bw) {
 }
 
 function triggerShotShield(bw) {
-  try { clipboard.writeText(''); } catch (e) { /* تجاهل */ }
+  try { Promise.resolve(clipboard.writeText('')).catch(() => {}); } catch (e) { /* تجاهل */ }
   const target = bw && !bw.isDestroyed() ? bw : win;
   if (target && !target.isDestroyed()) {
     try { target.webContents.send('dw:shield', true); } catch (e) { /* تجاهل */ }
@@ -545,11 +471,20 @@ app.whenReady().then(async () => {
     Menu.setApplicationMenu(null);
   }
 
+  // Do not start the content server, bridge, tray or app window before the
+  // Store check has authorized entry. A renderer cannot bypass this boundary.
+  try {
+    if (!(await enforceStoreStartup({ app, BrowserWindow, ipcMain, shell }))) return;
+  } catch (_) {
+    dialog.showErrorBox('Dr. Wael', 'تعذّر تشغيل فحص تحديث Microsoft Store. حاول فتح التطبيق من جديد.');
+    app.quit();
+    return;
+  }
+
   fetchSession = session.fromPartition('libfetch');
   const ses = session.defaultSession;
-  const okPerms = ['notifications', 'fullscreen', 'clipboard-sanitized-write', 'media'];
-  ses.setPermissionRequestHandler((wc, perm, cb) => cb(perm !== 'media' && okPerms.includes(perm)));
-  ses.setPermissionCheckHandler((wc, perm) => perm !== 'media' && okPerms.includes(perm));
+  ses.setPermissionRequestHandler((wc, perm, cb, details) => cb(allowPermission(wc, perm, details, win, PORT)));
+  ses.setPermissionCheckHandler((wc, perm, origin, details) => allowPermission(wc, perm, { ...(details || {}), requestingUrl: details?.requestingUrl || origin }, win, PORT));
   if (typeof ses.setDisplayMediaRequestHandler === 'function') {
     ses.setDisplayMediaRequestHandler((_req, cb) => cb({}));
   }

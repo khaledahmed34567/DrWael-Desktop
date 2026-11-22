@@ -39,7 +39,15 @@
       "app/**",
       "assets/**",
       "build/**",
-      "package.json"
+      "package.json",
+      "store-update.js",
+      "store-startup.js",
+      "store-gate-preload.js",
+      "store-gate-renderer.js",
+      "store-gate.html",
+      "store-gate.css",
+      "desktop-http.js",
+      "desktop-security.js"
     ],
     "win": {
       "target": [

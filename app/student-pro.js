@@ -353,7 +353,57 @@
     return (Array.isArray(notes) ? notes : []).filter(Boolean).map(n => String(n.title||'')+'\n'+String(n.body||'')).join('\n\n--------------------\n\n');
   }
 
+  function createFocusSession(minutes, nowMs, id) {
+    if (!Number.isInteger(minutes) || minutes < 5 || minutes > 120 || !Number.isFinite(nowMs)) throw new Error('Invalid focus duration');
+    return { schema: 1, id: String(id || ('focus_' + nowMs)).slice(0,80), phase: 'running', durationMs: minutes * 60000, endAt: nowMs + minutes * 60000, remainingMs: minutes * 60000 };
+  }
+  function focusSnapshot(session, nowMs) {
+    if (!session || session.schema !== 1 || typeof session.id !== 'string' || !['running','paused','completed'].includes(session.phase) || !Number.isInteger(session.durationMs) || session.durationMs < 300000 || session.durationMs > 7200000 || !Number.isFinite(nowMs)) return null;
+    const out = { ...session };
+    if (out.phase === 'running') {
+      if (!Number.isFinite(out.endAt)) return null;
+      out.remainingMs = Math.max(0, Math.min(out.durationMs, out.endAt - nowMs));
+      if (out.remainingMs === 0) { out.phase = 'completed'; out.completedAt = out.endAt; }
+    } else if (out.phase === 'completed') out.remainingMs = 0;
+    else if (!Number.isFinite(out.remainingMs) || out.remainingMs < 0 || out.remainingMs > out.durationMs) return null;
+    return out;
+  }
+  function transitionFocus(session, action, nowMs) {
+    const out = focusSnapshot(session, nowMs);
+    if (!out || out.phase === 'completed') return out;
+    if (action === 'pause' && out.phase === 'running') out.phase = 'paused';
+    else if (action === 'resume' && out.phase === 'paused') { out.phase = 'running'; out.endAt = nowMs + out.remainingMs; }
+    return out;
+  }
+  function examCalendar(exams, nowMs) {
+    const now = new Date(nowMs === undefined ? Date.now() : nowMs);
+    if (!Number.isFinite(now.getTime())) throw new Error('Invalid calendar time');
+    const stamp = now.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}Z$/,'Z');
+    const escape = value => String(value || '').replace(/\\/g,'\\\\').replace(/\r\n|\r|\n/g,'\\n').replace(/;/g,'\\;').replace(/,/g,'\\,');
+    const date = d => d.toISOString().slice(0,10).replace(/-/g,'');
+    const lines = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//DrWael//Student Exams//EN','CALSCALE:GREGORIAN'];
+    (Array.isArray(exams) ? exams : []).forEach((exam,index) => {
+      if (!exam || examDaysLeft(exam.date,now.getTime()) === null || !String(exam.title || '').trim()) return;
+      const [y,m,d] = exam.date.split('-').map(Number);
+      const end = new Date(Date.UTC(y,m-1,d+1));
+      const id = String(exam.id || index).replace(/[^a-zA-Z0-9_.-]/g,'_').slice(0,120);
+      lines.push('BEGIN:VEVENT','UID:'+id+'@drwael.local','DTSTAMP:'+stamp,'DTSTART;VALUE=DATE:'+exam.date.replace(/-/g,''),'DTEND;VALUE=DATE:'+date(end),'SUMMARY:'+escape(exam.title),'TRANSP:TRANSPARENT','END:VEVENT');
+    });
+    lines.push('END:VCALENDAR');
+    const fold = line => {
+      const parts=[];let current='',bytes=0;
+      for(const ch of line) {
+        const size=new TextEncoder().encode(ch).length;
+        if(bytes+size>75){parts.push(current);current=' ';bytes=1;}
+        current+=ch;bytes+=size;
+      }
+      parts.push(current);return parts.join('\r\n');
+    };
+    return lines.map(fold).join('\r\n')+'\r\n';
+  }
+
   return {
+    createFocusSession, focusSnapshot, transitionFocus, examCalendar,
     examDaysLeft,
     searchStudyNotes,
     exportStudyNotes,

@@ -98,6 +98,7 @@ $('b').onclick=async()=>{try{
   async function handle(raw) {
     let m;
     try { m = JSON.parse(raw); } catch (e) { return null; }
+    if (!m || typeof m !== 'object' || Array.isArray(m)) return null;
     const id = m.id || 0;
     const ok = (extra) => Object.assign({ id, ok: true }, extra || {});
     const no = (err) => ({ id, ok: false, err: err || 'failed' });

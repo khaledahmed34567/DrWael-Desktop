@@ -133,5 +133,7 @@ test('desktop updates no longer fetch repository installers and Store tiles avoi
   const workflow=fs.readFileSync(path.join(__dirname,'../.github/workflows/store-build.yml'),'utf8');
   assert.ok(!workflow.includes('[System.Drawing.Color]::Black'));
   assert.ok(workflow.includes('[System.Drawing.Color]::White'));
-  assert.ok(workflow.includes('#FFFFFF'));
+  const prepare = fs.readFileSync(path.join(__dirname, '..', 'scripts', 'prepare-store.js'), 'utf8');
+  assert.ok(prepare.includes('#FFFFFF'));
+  assert.ok(workflow.includes('node scripts/prepare-store.js'));
 });
