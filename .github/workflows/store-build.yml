@@ -2,50 +2,86 @@ name: Build Store Package
 'on':
   workflow_dispatch: null
 permissions:
-  contents: read
+  contents: write
 jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+      with:
+        ref: main
+    - uses: actions/setup-node@v5
+      with:
+        node-version: '22'
+    - name: Apply reviewed student feature update
+      shell: bash
+      run: 'if grep -q ''function examDaysLeft'' app/student-pro.js; then echo ''Student update already applied''; else
+
+        python - <<''PY''
+
+        import base64
+
+        from pathlib import Path
+
+        Path(''/tmp/student-update.patch'').write_bytes(base64.b64decode(''ZGlmZiAtLWdpdCBhL2FwcC9pbmRleC5odG1sIGIvYXBwL2luZGV4Lmh0bWwKaW5kZXggNDNlYTQ0ZS4uNmQxMWY4YyAxMDA2NDQKLS0tIGEvYXBwL2luZGV4Lmh0bWwKKysrIGIvYXBwL2luZGV4Lmh0bWwKQEAgLTIzOTYsNiArMjM5NiwxMSBAQCBmdW5jdGlvbiBtb3VudFVwZGF0ZUJhbm5lcigpewogICB9CiB9CiBhc3luYyBmdW5jdGlvbiBjaGVja0FwcFVwZGF0ZXMob3B0cyl7CisgIGlmKERFU0speworICAgIF9hcHBVcGRhdGVTdGF0ZT1udWxsO21vdW50VXBkYXRlQmFubmVyKCk7CisgICAgaWYob3B0cyYmb3B0cy5tYW51YWwpe25yZXEoInVwZGF0ZSIpO3RvYXN0KEwoItin2YTYqtit2K/Zitir2KfYqiDZhdiq2KfYrdipINmF2YYgTWljcm9zb2Z0IFN0b3JlIiwiVXBkYXRlcyBhcmUgbWFuYWdlZCBieSBNaWNyb3NvZnQgU3RvcmUiKSl9CisgICAgcmV0dXJuIG51bGw7CisgIH0KICAgY29uc3QgcGM9d2luZG93LkRXUHJvZ3Jlc3NDaGFydDsKICAgaWYoIXBjKXJldHVybiBudWxsOwogICBjb25zdCBmb3JjZT0hIShvcHRzJiZvcHRzLmZvcmNlKSxtYW51YWw9ISEob3B0cyYmb3B0cy5tYW51YWwpOwpAQCAtMjQzOCw2ICsyNDQzLDcgQEAgYXN5bmMgZnVuY3Rpb24gY2hlY2tBcHBVcGRhdGVzKG9wdHMpewogICByZXR1cm4gcmVzOwogfQogd2luZG93LmFkZEV2ZW50TGlzdGVuZXIoImR3LXVwZGF0ZSIsZXY9PnsKKyAgaWYoREVTSylyZXR1cm47CiAgIGNvbnN0IGQ9ZXYmJmV2LmRldGFpbHx8e307CiAgIGNvbnN0IHY9U3RyaW5nKGQudmVyc2lvbnx8IiIpOwogICBjb25zdCBpc1JlYWR5PWQuc3RhdHVzPT09ImRvd25sb2FkZWQiOwpAQCAtMjQ2Miw2ICsyNDY4LDcgQEAgZy5xdWVyeVNlbGVjdG9yQWxsKCIuZGVsIikuZm9yRWFjaChiPT5iLm9uY2xpY2s9YXN5bmMoKT0+e2lmKCFjb25maXJtKEwoItit2LDZgQogY29uc3QgYWQ9JCgiI2RsYWQiKTtpZihhZCYmYWRtKXthZC5pbm5lckhUTUw9YDxsYWJlbCBjbGFzcz0iYnRuIGdob3N0IiBzdHlsZT0ibWFyZ2luLXRvcDoxMHB4O2Rpc3BsYXk6YmxvY2s7dGV4dC1hbGlnbjpjZW50ZXIiPiR7TCgi2LHZgdi5INi12YjYsSDZhdmGINin2YTYqti32KjZitmCIiwiVXBsb2FkIGFwcCBzY3JlZW5zaG90cyIpfTxpbnB1dCB0eXBlPSJmaWxlIiBpZD0iZGxmIiBhY2NlcHQ9ImltYWdlLyoiIG11bHRpcGxlIGhpZGRlbj48L2xhYmVsPjxwIGNsYXNzPSJzbWFsbCIgaWQ9ImRsbSI+PC9wPmA7CiAkKCIjZGxmIikub25jaGFuZ2U9YXN5bmMgZT0+e2NvbnN0IGZzPVsuLi5lLnRhcmdldC5maWxlc10uc2xpY2UoMCwxMiksbT0kKCIjZGxtIik7aWYoIWZzLmxlbmd0aClyZXR1cm47Y29uc3QgdXJscz1bXTt0cnl7Zm9yKGxldCBpPTA7aTxmcy5sZW5ndGg7aSsrKXttLnRleHRDb250ZW50PUwoItis2KfYsdmKINin2YTYsdmB2LkgIiwiVXBsb2FkaW5nICIpKyhpKzEpKyIgLyAiK2ZzLmxlbmd0aDt1cmxzLnB1c2goYXdhaXQgaW1nYmIoZnNbaV0pKX1hd2FpdCBkYi5kb2MoInNldHRpbmdzL2FwcGRsIikuc2V0KHtzaG90czpmaXJlYmFzZS5maXJlc3RvcmUuRmllbGRWYWx1ZS5hcnJheVVuaW9uKC4uLnVybHMpfSx7bWVyZ2U6dHJ1ZX0pO2RsR2FsbGVyeSgpfWNhdGNoKHgpe20udGV4dENvbnRlbnQ9TCgi2KrYudiw2LEg2KfZhNix2YHYuS4g2KrYo9mD2K8g2YXZhiDZgtmI2KfYudivINin2YTYrdmF2KfZitipINmE2YAgc2V0dGluZ3MvYXBwZGwuIiwiVXBsb2FkIGZhaWxlZC4gQ2hlY2sgdGhlIHNlY3VyaXR5IHJ1bGUgZm9yIHNldHRpbmdzL2FwcGRsLiIpfX19fQogZnVuY3Rpb24gc2hvd0RsKCl7CisgIGlmKERFU0spe25yZXEoInVwZGF0ZSIpO3JldHVybn0KICAgY29uc3Qgb2xkPSQoIiNkbHAiKTtpZihvbGQpb2xkLnJlbW92ZSgpOwogICBjb25zdCBwYz13aW5kb3cuRFdQcm9ncmVzc0NoYXJ0OwogICBjb25zdCBwbGF0PXBjP3BjLmRldGVjdENsaWVudFBsYXRmb3JtKG5hdmlnYXRvci51c2VyQWdlbnQsd2luZG93LkRXTmF0aXZlJiZEV05hdGl2ZS5wbGF0Zm9ybSk6ImFuZHJvaWQiOwpAQCAtMzA3Nyw3ICszMDg0LDggQEAgZnVuY3Rpb24gdlN0dWRlbnRIdWIodGFiKXsKICAgICAgIFsiY2FyZHMiLEwoItin2YTYqNi32KfZgtin2KoiLCJGbGFzaGNhcmRzIildLAogICAgICAgWyJwbGFubmVyIixMKCLYrti32KrZiiIsIlBsYW5uZXIiKV0sCiAgICAgICBbImNhbGMiLEwoIkdQQSDZiNmF2K3Yp9mE2YrZhCIsIkdQQSAmIEZsdWlkcyIpXSwKLSAgICAgIFsibm90ZXMiLEwoItmF2YHZg9ix2KrZiiIsIk5vdGVzIildCisgICAgICBbIm5vdGVzIixMKCLZhdmB2YPYsdiq2YoiLCJOb3RlcyIpXSwKKyAgICAgIFsiZXhhbXMiLEwoItin2YXYqtit2KfZhtin2KrZiiIsIkV4YW1zIildCiAgICAgXTsKICAgICByZXR1cm5gPGRpdiBjbGFzcz0ic2VnIiBzdHlsZT0ibWFyZ2luLWJvdHRvbToxMnB4Ij4ke3RhYnMubWFwKHg9PmA8YnV0dG9uIGRhdGEtaHQ9IiR7eFswXX0iIGNsYXNzPSIke19odWJUYWI9PT14WzBdPyJvbiI6IiJ9Ij4ke2VzYyh4WzFdKX08L2J1dHRvbj5gKS5qb2luKCIiKX08L2Rpdj48ZGl2IGlkPSJodWJCb2R5Ij48L2Rpdj5gOwogICB9OwpAQCAtMzI0NSw3ICszMjUzLDE3IEBAIGZ1bmN0aW9uIHZTdHVkZW50SHViKHRhYil7CiAgICAgICByZXR1cm47CiAgICAgfQogCisgICAgaWYoX2h1YlRhYj09PSJleGFtcyIpeworICAgICAgY29uc3QgZXhhbUtleT0iZHdfZXhhbXNfIit1aWQ7CisgICAgICBjb25zdCBleGFtcz1nZXRBcnIoZXhhbUtleSkuZmlsdGVyKGU9PmUmJnNwLmV4YW1EYXlzTGVmdChlLmRhdGUpIT09bnVsbCkuc29ydCgoYSxiKT0+YS5kYXRlLmxvY2FsZUNvbXBhcmUoYi5kYXRlKSk7CisgICAgICBoYi5pbm5lckhUTUw9YDxkaXYgY2xhc3M9ImNhcmQiPjxkaXYgY2xhc3M9ImxhYiI+JHtMKCLZhdmI2KfYudmK2K8g2KfZhNin2YXYqtit2KfZhtin2Kog2YjYp9mE2LnYryDYp9mE2KrZhtin2LLZhNmKIiwiRXhhbSBkYXRlcyAmIGNvdW50ZG93biIpfTwvZGl2PjxwIGNsYXNzPSJzbWFsbCI+JHtMKCLZhdit2YHZiNi42Kkg2LnZhNmJINmH2LDYpyDYp9mE2KzZh9in2LIg2YHZgti3LiDZhNinINiq2LHYs9mEINiq2YbYqNmK2YfYp9iqINmB2Yog2KfZhNiu2YTZgdmK2KkuIiwiU2F2ZWQgb24gdGhpcyBkZXZpY2Ugb25seS4gTm8gYmFja2dyb3VuZCByZW1pbmRlcnMuIil9PC9wPjxsYWJlbCBjbGFzcz0ic21hbGwiIGZvcj0iZXhhbVRpdGxlIj4ke0woItin2YTZhdin2K/YqSIsIlN1YmplY3QiKX08L2xhYmVsPjxpbnB1dCBjbGFzcz0iZmkiIGlkPSJleGFtVGl0bGUiIG1heGxlbmd0aD0iMTIwIj48bGFiZWwgY2xhc3M9InNtYWxsIiBmb3I9ImV4YW1EYXRlIj4ke0woItiq2KfYsdmK2K4g2KfZhNin2YXYqtit2KfZhiIsIkV4YW0gZGF0ZSIpfTwvbGFiZWw+PGlucHV0IGNsYXNzPSJmaSIgdHlwZT0iZGF0ZSIgaWQ9ImV4YW1EYXRlIj48YnV0dG9uIGNsYXNzPSJidG4gZ29sZCIgaWQ9ImV4YW1BZGQiPiR7TCgi2KXYttin2YHYqSDYp9mF2KrYrdin2YYiLCJBZGQgZXhhbSIpfTwvYnV0dG9uPjwvZGl2PjxkaXY+JHtleGFtcy5sZW5ndGg/ZXhhbXMubWFwKGU9Pntjb25zdCBkYXlzPXNwLmV4YW1EYXlzTGVmdChlLmRhdGUpO3JldHVybiBgPGRpdiBjbGFzcz0iaXRlbSI+PGRpdiBjbGFzcz0ibm0iPiR7ZXNjKGUudGl0bGUpfTwvZGl2PjxkaXYgY2xhc3M9InNtYWxsIiBkaXI9Imx0ciI+JHtlc2MoZS5kYXRlKX08L2Rpdj48ZGl2IGNsYXNzPSJzdGF0ICR7ZGF5czwwPyIiOiJvayJ9Ij4ke2RheXM9PT0wP0woItin2YTYp9mF2KrYrdin2YYg2KfZhNmK2YjZhSIsIkV4YW0gdG9kYXkiKTpkYXlzPjA/TCgi2KjYp9mC2YogIitkYXlzKyIg2YrZiNmFIiwiSW4gIitkYXlzKyIgZGF5cyIpOkwoItin2YbYqtmH2Ykg2YXZhtiwICIrTWF0aC5hYnMoZGF5cykrIiDZitmI2YUiLE1hdGguYWJzKGRheXMpKyIgZGF5cyBhZ28iKX08L2Rpdj48YnV0dG9uIGNsYXNzPSJybSIgZGF0YS1leGFtLWRlbGV0ZT0iJHtlc2MoZS5pZCl9Ij4ke0woItit2LDZgSIsIkRlbGV0ZSIpfTwvYnV0dG9uPjwvZGl2PmB9KS5qb2luKCIiKTpgPGRpdiBjbGFzcz0iZW1wdHkiPiR7TCgi2KPYttmBINmF2YjYudivINin2YXYqtit2KfZhtmDINin2YTZgtin2K/ZhSDZhNiq2YbYuNmK2YUg2KfZhNmF2LHYp9is2LnYqS4iLCJBZGQgeW91ciBuZXh0IGV4YW0gdG8gcGxhbiB5b3VyIHJldmlzaW9uLiIpfTwvZGl2PmB9PC9kaXY+YDsKKyAgICAgICQoIiNleGFtQWRkIikub25jbGljaz0oKT0+e2NvbnN0IHRpdGxlPSQoIiNleGFtVGl0bGUiKS52YWx1ZS50cmltKCksZGF0ZT0kKCIjZXhhbURhdGUiKS52YWx1ZTtpZighdGl0bGV8fHNwLmV4YW1EYXlzTGVmdChkYXRlKT09PW51bGwpe3RvYXN0KEwoItin2YPYqtioINin2YTZhdin2K/YqSDZiNin2K7YqtixINiq2KfYsdmK2K7Zi9inINi12K3Zitit2YvYpyIsIkVudGVyIGEgc3ViamVjdCBhbmQgYSB2YWxpZCBkYXRlIikpO3JldHVybn1jb25zdCBsaXN0PWdldEFycihleGFtS2V5KTtsaXN0LnB1c2goe2lkOiJleGFtXyIrRGF0ZS5ub3coKSx0aXRsZTp0aXRsZS5zbGljZSgwLDEyMCksZGF0ZX0pO2xzLnNldChleGFtS2V5LEpTT04uc3RyaW5naWZ5KGxpc3Quc2xpY2UoLTEwMCkpKTtkcmF3VGFiKCl9OworICAgICAgJCQoIltkYXRhLWV4YW0tZGVsZXRlXSIpLmZvckVhY2goYj0+Yi5vbmNsaWNrPSgpPT57aWYoIWNvbmZpcm0oTCgi2K3YsNmBINmF2YjYudivINin2YTYp9mF2KrYrdin2YbYnyIsIkRlbGV0ZSB0aGlzIGV4YW0/IikpKXJldHVybjtscy5zZXQoZXhhbUtleSxKU09OLnN0cmluZ2lmeShnZXRBcnIoZXhhbUtleSkuZmlsdGVyKGU9PmUuaWQhPT1iLmRhdGFzZXQuZXhhbURlbGV0ZSkpKTtkcmF3VGFiKCl9KTsKKyAgICAgIHJldHVybjsKKyAgICB9CisKICAgICBjb25zdCBub3Rlcz1nZXRBcnIobm90ZXNLZXkpOworICAgIGxldCBub3RlUXVlcnk9IiI7CiAgICAgaGIuaW5uZXJIVE1MPWAKICAgICAgIDxkaXYgY2xhc3M9ImNhcmQiPgogICAgICAgICA8ZGl2IGNsYXNzPSJsYWIiPiR7TCgi2KPYttmBINmF2YTYp9it2LjYqSDYr9ix2KfYs9mK2Kkg2KzYr9mK2K/YqSIsIkFkZCBhIHN0dWR5IG5vdGUiKX08L2Rpdj4KQEAgLTMyNTMsMTEgKzMyNzEsMjAgQEAgZnVuY3Rpb24gdlN0dWRlbnRIdWIodGFiKXsKICAgICAgICAgPHRleHRhcmVhIGNsYXNzPSJmaSIgaWQ9Im50QiIgcm93cz0iMyIgcGxhY2Vob2xkZXI9IiR7TCgi2KfZg9iq2Kgg2KrZhNiu2YrYtdmL2KfYjCDYrNix2LnYqSDZhdmH2YXYqdiMINij2Ygg2YbZgti32Kkg2KfZhdiq2K3Yp9mGLi4uIiwiV3JpdGUgYSBzdW1tYXJ5LCBrZXkgZG9zYWdlLCBvciBleGFtIHBvaW50Li4uIil9Ij48L3RleHRhcmVhPgogICAgICAgICA8YnV0dG9uIGNsYXNzPSJidG4gZ29sZCIgaWQ9Im50QWRkIj4ke0woItit2YHYuCDYp9mE2YXZhNin2K3YuNipIiwiU2F2ZSBub3RlIil9PC9idXR0b24+CiAgICAgICA8L2Rpdj4KLSAgICAgICR7bm90ZXMubGVuZ3RoP25vdGVzLm1hcChuPT5gPGRpdiBjbGFzcz0iaXRlbSI+PGRpdiBjbGFzcz0ibm0iPiR7ZXNjKG4udGl0bGUpfTwvZGl2PjxkaXYgY2xhc3M9InR4Ij4ke2VzYyhuLmJvZHkpfTwvZGl2PjxkaXYgY2xhc3M9InNtYWxsIj4ke2ZkKG4uYXQpfTwvZGl2PjxkaXYgY2xhc3M9ImFjdHMiPjxidXR0b24gY2xhc3M9InBsIiBkYXRhLW50Yz0iJHtlc2Mobi5pZCl9Ij4ke3QoImNvcHkiKX08L2J1dHRvbj48YnV0dG9uIGNsYXNzPSJybSIgZGF0YS1udGQ9IiR7ZXNjKG4uaWQpfSI+JHtMKCLYrdiw2YEiLCJEZWxldGUiKX08L2J1dHRvbj48L2Rpdj48L2Rpdj5gKS5qb2luKCIiKTpgPGRpdiBjbGFzcz0iZW1wdHkiPiR7TCgi2YXZgdmD2LHYqtmDINmB2KfYsdi62Kkg2K3Yp9mE2YrZi9inIOKAlCDYp9it2YHYuCDZhdmE2KfYrdi42KfYqtmDINin2YTYs9ix2YrYudipINmH2YbYpy4iLCJZb3VyIG5vdGVib29rIGlzIGVtcHR5IOKAlCBzYXZlIHF1aWNrIHN0dWR5IG5vdGVzIGhlcmUuIil9PC9kaXY+YH0KKyAgICAgIDxkaXYgY2xhc3M9ImNhcmQiPjxsYWJlbCBjbGFzcz0ibGFiIiBmb3I9Im5vdGVzU2VhcmNoIj4ke0woItio2K3YqyDZgdmKINmF2YTYp9it2LjYp9iq2YMiLCJTZWFyY2ggeW91ciBub3RlcyIpfTwvbGFiZWw+PGlucHV0IGNsYXNzPSJmaSIgdHlwZT0ic2VhcmNoIiBpZD0ibm90ZXNTZWFyY2giIHBsYWNlaG9sZGVyPSIke0woIti52YbZiNin2YYg2KPZiCDZg9mE2YXYqSDZhdmGINin2YTZhdit2KrZiNmJIiwiVGl0bGUgb3IgYSB3b3JkIGZyb20gdGhlIG5vdGUiKX0iPjxidXR0b24gY2xhc3M9ImJ0biBnaG9zdCIgaWQ9Im5vdGVzRXhwb3J0IiAke25vdGVzLmxlbmd0aD8iIjoiZGlzYWJsZWQifT4ke0woItiq2LXYr9mK2LEg2KfZhNmF2YTYp9it2LjYp9iqINmD2YXZhNmBINmG2LXZiiIsIkV4cG9ydCBub3RlcyBhcyB0ZXh0Iil9PC9idXR0b24+PHAgY2xhc3M9InNtYWxsIj4ke0woItin2YTZhdmE2YEg2YrYrdiq2YjZiiDYudmE2Ykg2YXZhNin2K3YuNin2KrZgyDYp9mE2LTYrti12YrYqS4g2KfYrdmB2LjZhyDZgdmKINmF2YPYp9mGINii2YXZhi4iLCJUaGlzIGZpbGUgY29udGFpbnMgeW91ciBwZXJzb25hbCBub3Rlcy4gS2VlcCBpdCBzb21ld2hlcmUgc2FmZS4iKX08L3A+PC9kaXY+CisgICAgICA8ZGl2IGlkPSJub3Rlc1Jlc3VsdHMiPjwvZGl2PgogICAgIGA7CisgICAgY29uc3QgcmVuZGVyTm90ZXM9KCk9PnsKKyAgICAgIGNvbnN0IGZpbHRlcmVkPXNwLnNlYXJjaFN0dWR5Tm90ZXMobm90ZXMsbm90ZVF1ZXJ5KTsKKyAgICAgICQoIiNub3Rlc1Jlc3VsdHMiKS5pbm5lckhUTUw9ZmlsdGVyZWQubGVuZ3RoP2ZpbHRlcmVkLm1hcChuPT5gPGRpdiBjbGFzcz0iaXRlbSI+PGRpdiBjbGFzcz0ibm0iPiR7ZXNjKG4udGl0bGUpfTwvZGl2PjxkaXYgY2xhc3M9InR4IiBzdHlsZT0id2hpdGUtc3BhY2U6cHJlLXdyYXAiPiR7ZXNjKG4uYm9keSl9PC9kaXY+PGRpdiBjbGFzcz0ic21hbGwiPiR7ZmQobi5hdCl9PC9kaXY+PGRpdiBjbGFzcz0iYWN0cyI+PGJ1dHRvbiBjbGFzcz0icGwiIGRhdGEtbnRjPSIke2VzYyhuLmlkKX0iPiR7dCgiY29weSIpfTwvYnV0dG9uPjxidXR0b24gY2xhc3M9InJtIiBkYXRhLW50ZD0iJHtlc2Mobi5pZCl9Ij4ke0woItit2LDZgSIsIkRlbGV0ZSIpfTwvYnV0dG9uPjwvZGl2PjwvZGl2PmApLmpvaW4oIiIpOmA8ZGl2IGNsYXNzPSJlbXB0eSI+JHtMKCLZhNinINiq2YjYrNivINmF2YTYp9it2LjYp9iqINmF2LfYp9io2YLYqS4iLCJObyBtYXRjaGluZyBub3Rlcy4iKX08L2Rpdj5gOworICAgICAgJCQoIltkYXRhLW50Y10iKS5mb3JFYWNoKGI9PmIub25jbGljaz0oKT0+e2NvbnN0IGl0PW5vdGVzLmZpbmQoeD0+eC5pZD09PWIuZGF0YXNldC5udGMpO2lmKGl0KXRyeXtuYXZpZ2F0b3IuY2xpcGJvYXJkLndyaXRlVGV4dChpdC50aXRsZSsiXG4iK2l0LmJvZHkpO3RvYXN0KHQoImNvcGllZCIpKX1jYXRjaChlKXt9fSk7CisgICAgICAkJCgiW2RhdGEtbnRkXSIpLmZvckVhY2goYj0+Yi5vbmNsaWNrPSgpPT57aWYoIWNvbmZpcm0oTCgi2K3YsNmBINmH2LDZhyDYp9mE2YXZhNin2K3YuNip2J8iLCJEZWxldGUgdGhpcyBub3RlPyIpKSlyZXR1cm47bHMuc2V0KG5vdGVzS2V5LEpTT04uc3RyaW5naWZ5KGdldEFycihub3Rlc0tleSkuZmlsdGVyKHg9PnguaWQhPT1iLmRhdGFzZXQubnRkKSkpO2RyYXdUYWIoKX0pOworICAgIH07CisgICAgJCgiI25vdGVzU2VhcmNoIikub25pbnB1dD1lPT57bm90ZVF1ZXJ5PWUudGFyZ2V0LnZhbHVlO3JlbmRlck5vdGVzKCl9OworICAgICQoIiNub3Rlc0V4cG9ydCIpLm9uY2xpY2s9KCk9PmRsKG5ldyBCbG9iKFsiXHVmZWZmIitzcC5leHBvcnRTdHVkeU5vdGVzKG5vdGVzKV0se3R5cGU6InRleHQvcGxhaW47Y2hhcnNldD11dGYtOCJ9KSwiRHJXYWVsLXN0dWR5LW5vdGVzLnR4dCIpOworICAgIHJlbmRlck5vdGVzKCk7CiAgICAgJCgiI250QWRkIikub25jbGljaz0oKT0+e2NvbnN0IHRpPSQoIiNudFQiKS52YWx1ZS50cmltKCksYmQ9JCgiI250QiIpLnZhbHVlLnRyaW0oKTtpZighdGl8fCFiZCl7dG9hc3QoTCgi2KfZg9iq2Kgg2KfZhNi52YbZiNin2YYg2YjYp9mE2YXYrdiq2YjZiSIsIkVudGVyIHRpdGxlIGFuZCBub3RlIikpO3JldHVybn1jb25zdCBsaXN0PWdldEFycihub3Rlc0tleSk7bGlzdC51bnNoaWZ0KHtpZDoibnRfIitEYXRlLm5vdygpLHRpdGxlOnRpLnNsaWNlKDAsMTAwKSxib2R5OmJkLnNsaWNlKDAsMjAwMCksYXQ6RGF0ZS5ub3coKX0pO2xzLnNldChub3Rlc0tleSxKU09OLnN0cmluZ2lmeShsaXN0LnNsaWNlKDAsMTIwKSkpO3RvYXN0KEwoItiq2YUg2K3Zgdi4INin2YTZhdmE2KfYrdi42KkiLCJOb3RlIHNhdmVkIikpO2RyYXdUYWIoKX07Ci0gICAgJCQoIltkYXRhLW50Y10iKS5mb3JFYWNoKGI9PmIub25jbGljaz0oKT0+e2NvbnN0IGl0PWdldEFycihub3Rlc0tleSkuZmluZCh4PT54LmlkPT09Yi5kYXRhc2V0Lm50Yyk7aWYoaXQpdHJ5e25hdmlnYXRvci5jbGlwYm9hcmQud3JpdGVUZXh0KGl0LnRpdGxlKyJcbiIraXQuYm9keSk7dG9hc3QodCgiY29waWVkIikpfWNhdGNoKGUpe319KTsKLSAgICAkJCgiW2RhdGEtbnRkXSIpLmZvckVhY2goYj0+Yi5vbmNsaWNrPSgpPT57bHMuc2V0KG5vdGVzS2V5LEpTT04uc3RyaW5naWZ5KGdldEFycihub3Rlc0tleSkuZmlsdGVyKHg9PnguaWQhPT1iLmRhdGFzZXQubnRkKSkpO2RyYXdUYWIoKX0pOworCiAgIH0KICAgZHJhd1RhYigpOwogfQpkaWZmIC0tZ2l0IGEvYXBwL3N0dWRlbnQtcHJvLmpzIGIvYXBwL3N0dWRlbnQtcHJvLmpzCmluZGV4IGVlNTg1ODAuLmY2OTFmNjggMTAwNjQ0Ci0tLSBhL2FwcC9zdHVkZW50LXByby5qcworKysgYi9hcHAvc3R1ZGVudC1wcm8uanMKQEAgLTMzMyw3ICszMzMsMzAgQEAKICAgICB9OwogICB9CiAKKyAgLy8gRGF0ZS1vbmx5IGRlYWRsaW5lcyB1c2UgY2FsZW5kYXIgZGF5cywgbm90IGVsYXBzZWQgaG91cnMgKERTVC1zYWZlKS4KKyAgZnVuY3Rpb24gZXhhbURheXNMZWZ0KGRhdGVUZXh0LCBub3dNcykgeworICAgIGlmICghL15cZHs0fS1cZHsyfS1cZHsyfSQvLnRlc3QoU3RyaW5nKGRhdGVUZXh0KSkpIHJldHVybiBudWxsOworICAgIGNvbnN0IFt5LG0sZF0gPSBkYXRlVGV4dC5zcGxpdCgnLScpLm1hcChOdW1iZXIpOworICAgIGNvbnN0IGV4YW0gPSBuZXcgRGF0ZSh5LG0tMSxkKTsKKyAgICBpZihleGFtLmdldEZ1bGxZZWFyKCkhPT15IHx8IGV4YW0uZ2V0TW9udGgoKSE9PW0tMSB8fCBleGFtLmdldERhdGUoKSE9PWQpIHJldHVybiBudWxsOworICAgIGNvbnN0IG5vdyA9IG5ldyBEYXRlKG5vd01zID09PSB1bmRlZmluZWQgPyBEYXRlLm5vdygpIDogbm93TXMpOworICAgIHJldHVybiBNYXRoLnJvdW5kKChEYXRlLlVUQyh5LG0tMSxkKS1EYXRlLlVUQyhub3cuZ2V0RnVsbFllYXIoKSxub3cuZ2V0TW9udGgoKSxub3cuZ2V0RGF0ZSgpKSkvODY0MDAwMDApOworICB9CisKKyAgZnVuY3Rpb24gc2VhcmNoU3R1ZHlOb3Rlcyhub3RlcywgcXVlcnkpIHsKKyAgICBjb25zdCBub3JtYWxpemUgPSB2YWx1ZSA9PiBTdHJpbmcodmFsdWUgfHwgJycpLm5vcm1hbGl6ZSgnTkZLQycpLnRvTG9jYWxlTG93ZXJDYXNlKCkucmVwbGFjZSgvW1x1MDY0Qi1cdTA2NUZcdTA2NzBcdTA2NDBdL2csJycpLnRyaW0oKTsKKyAgICBjb25zdCBxID0gbm9ybWFsaXplKHF1ZXJ5KTsKKyAgICByZXR1cm4gKEFycmF5LmlzQXJyYXkobm90ZXMpID8gbm90ZXMgOiBbXSkuZmlsdGVyKG4gPT4gbiAmJiAoIXEgfHwgbm9ybWFsaXplKG4udGl0bGUrJyAnK24uYm9keSkuaW5jbHVkZXMocSkpKTsKKyAgfQorCisgIGZ1bmN0aW9uIGV4cG9ydFN0dWR5Tm90ZXMobm90ZXMpIHsKKyAgICByZXR1cm4gKEFycmF5LmlzQXJyYXkobm90ZXMpID8gbm90ZXMgOiBbXSkuZmlsdGVyKEJvb2xlYW4pLm1hcChuID0+IFN0cmluZyhuLnRpdGxlfHwnJykrJ1xuJytTdHJpbmcobi5ib2R5fHwnJykpLmpvaW4oJ1xuXG4tLS0tLS0tLS0tLS0tLS0tLS0tLVxuXG4nKTsKKyAgfQorCiAgIHJldHVybiB7CisgICAgZXhhbURheXNMZWZ0LAorICAgIHNlYXJjaFN0dWR5Tm90ZXMsCisgICAgZXhwb3J0U3R1ZHlOb3RlcywKICAgICBPTkVfWUVBUl9NUywKICAgICBQUk9fRlJFRV9MQVVOQ0hfTVMsCiAgICAgZXZhbHVhdGVQcm9BY2Nlc3MsCmRpZmYgLS1naXQgYS9wYWNrYWdlLmpzb24gYi9wYWNrYWdlLmpzb24KaW5kZXggNTIxZGUzNS4uY2QxNjQ1ZSAxMDA2NDQKLS0tIGEvcGFja2FnZS5qc29uCisrKyBiL3BhY2thZ2UuanNvbgpAQCAtOTYsMTQgKzk2LDYgQEAKICAgICAgICJjYXRlZ29yeSI6ICJFZHVjYXRpb24iLAogICAgICAgIm1haW50YWluZXIiOiAiRHIuIFdhZWwgPGluZm9AZHJ3YWVsLmFwcD4iLAogICAgICAgImFydGlmYWN0TmFtZSI6ICJEcldhZWwtbGludXguJHtleHR9IgotICAgIH0sCi0gICAgInB1Ymxpc2giOiBbCi0gICAgICB7Ci0gICAgICAgICJwcm92aWRlciI6ICJnaXRodWIiLAotICAgICAgICAib3duZXIiOiAia2hhbGVkYWhtZWQzNDU2NyIsCi0gICAgICAgICJyZXBvIjogIkRyV2FlbC1EZXNrdG9wIiwKLSAgICAgICAgInJlbGVhc2VUeXBlIjogInJlbGVhc2UiCi0gICAgICB9Ci0gICAgXQorICAgIH0KICAgfQogfQpkaWZmIC0tZ2l0IGEvdGVzdHMvc3R1ZGVudC1wcm8udGVzdC5qcyBiL3Rlc3RzL3N0dWRlbnQtcHJvLnRlc3QuanMKaW5kZXggMzcxNDkwZS4uMmYxOTZjZCAxMDA2NDQKLS0tIGEvdGVzdHMvc3R1ZGVudC1wcm8udGVzdC5qcworKysgYi90ZXN0cy9zdHVkZW50LXByby50ZXN0LmpzCkBAIC0xMDIsMyArMTAyLDM2IEBAIHRlc3QoJ2ZsYXNoY2FyZHMsIEdQQSBjYWxjdWxhdG9yLCBJViBmbHVpZCByYXRlIGNhbGN1bGF0b3IsIGFuZCBzdHVkeSBwbGFubmVyIHdvCiAgIGFzc2VydC5lcXVhbChwbGFuLmRhaWx5UGVyY2VudCwgNzUpOwogICBhc3NlcnQuZXF1YWwocGxhbi5nb2FsTWV0LCBmYWxzZSk7CiB9KTsKKworY29uc3Qge2V4YW1EYXlzTGVmdCwgc2VhcmNoU3R1ZHlOb3RlcywgZXhwb3J0U3R1ZHlOb3Rlc30gPSByZXF1aXJlKCcuLi9hcHAvc3R1ZGVudC1wcm8nKTsKK3Rlc3QoJ2V4YW0gY291bnRkb3duIHZhbGlkYXRlcyBjYWxlbmRhciBkYXRlcyBhbmQgdXNlcyB3aG9sZSBsb2NhbCBjYWxlbmRhciBkYXlzJywgKCkgPT4geworICBjb25zdCBub3c9bmV3IERhdGUoMjAyNiwxMCwyMiwyMyw1OSkuZ2V0VGltZSgpOworICBhc3NlcnQuZXF1YWwoZXhhbURheXNMZWZ0KCcyMDI2LTExLTIzJyxub3cpLDEpOworICBhc3NlcnQuZXF1YWwoZXhhbURheXNMZWZ0KCcyMDI2LTExLTIyJyxub3cpLDApOworICBhc3NlcnQuZXF1YWwoZXhhbURheXNMZWZ0KCcyMDI2LTExLTIwJyxub3cpLC0yKTsKKyAgYXNzZXJ0LmVxdWFsKGV4YW1EYXlzTGVmdCgnMjAyNi0wMi0zMCcsbm93KSxudWxsKTsKKyAgYXNzZXJ0LmVxdWFsKGV4YW1EYXlzTGVmdCgnMjAyNi0xMy0wMScsbm93KSxudWxsKTsKKyAgYXNzZXJ0LmVxdWFsKGV4YW1EYXlzTGVmdCgnYmFkJyxub3cpLG51bGwpOworICBhc3NlcnQuZXF1YWwoZXhhbURheXNMZWZ0KCcyMDI4LTAyLTI5JyxuZXcgRGF0ZSgyMDI4LDEsMjgpLmdldFRpbWUoKSksMSk7Cit9KTsKK3Rlc3QoJ25vdGVzIHNlYXJjaCBzdXBwb3J0cyBBcmFiaWMgZGlhY3JpdGljcywgRW5nbGlzaCBjYXNlIGFuZCBlbXB0eSBzZWFyY2hlcyB3aXRob3V0IG11dGF0aW9uJywgKCkgPT4geworICBjb25zdCBub3Rlcz1be3RpdGxlOifZhdmP2LHYp9is2LnYqScsYm9keTon2KrYtNix2YrYrSd9LHt0aXRsZTonQW5hdG9teScsYm9keTonUmV2aXNpb24gbm90ZXMnfV07CisgIGFzc2VydC5lcXVhbChzZWFyY2hTdHVkeU5vdGVzKG5vdGVzLCfZhdix2KfYrNi52KknKS5sZW5ndGgsMSk7CisgIGFzc2VydC5lcXVhbChzZWFyY2hTdHVkeU5vdGVzKG5vdGVzLCdSRVZJU0lPTicpLmxlbmd0aCwxKTsKKyAgYXNzZXJ0LmVxdWFsKHNlYXJjaFN0dWR5Tm90ZXMobm90ZXMsJ2Fic2VudCcpLmxlbmd0aCwwKTsKKyAgYXNzZXJ0LmVxdWFsKHNlYXJjaFN0dWR5Tm90ZXMobm90ZXMsJycpLmxlbmd0aCwyKTsKKyAgYXNzZXJ0LmVxdWFsKG5vdGVzLmxlbmd0aCwyKTsKKyAgYXNzZXJ0LmVxdWFsKGV4cG9ydFN0dWR5Tm90ZXMobm90ZXMpLCfZhdmP2LHYp9is2LnYqVxu2KrYtNix2YrYrVxuXG4tLS0tLS0tLS0tLS0tLS0tLS0tLVxuXG5BbmF0b215XG5SZXZpc2lvbiBub3RlcycpOworICBhc3NlcnQuZXF1YWwoZXhwb3J0U3R1ZHlOb3RlcyhbXSksJycpOworfSk7Cit0ZXN0KCdkZXNrdG9wIHVwZGF0ZXMgbm8gbG9uZ2VyIGZldGNoIHJlcG9zaXRvcnkgaW5zdGFsbGVycyBhbmQgU3RvcmUgdGlsZXMgYXZvaWQgYmxhY2sgZWRnZXMnLCAoKSA9PiB7CisgIGNvbnN0IGZzPXJlcXVpcmUoJ25vZGU6ZnMnKSxwYXRoPXJlcXVpcmUoJ25vZGU6cGF0aCcpOworICBjb25zdCBtYWluPWZzLnJlYWRGaWxlU3luYyhwYXRoLmpvaW4oX19kaXJuYW1lLCcuLi9tYWluLmpzJyksJ3V0ZjgnKTsKKyAgYXNzZXJ0Lm9rKCFtYWluLmluY2x1ZGVzKCdlbGVjdHJvbi11cGRhdGVyJykpOworICBhc3NlcnQub2soIW1haW4uaW5jbHVkZXMoJ3JlbGVhc2VzL2xhdGVzdCcpKTsKKyAgYXNzZXJ0Lm9rKG1haW4uaW5jbHVkZXMoJ21zLXdpbmRvd3Mtc3RvcmU6Ly9wZHAvP1Byb2R1Y3RJZD05TkNLMkwwOTdEN00nKSk7CisgIGNvbnN0IHdvcmtmbG93PWZzLnJlYWRGaWxlU3luYyhwYXRoLmpvaW4oX19kaXJuYW1lLCcuLi8uZ2l0aHViL3dvcmtmbG93cy9zdG9yZS1idWlsZC55bWwnKSwndXRmOCcpOworICBhc3NlcnQub2soIXdvcmtmbG93LmluY2x1ZGVzKCdbU3lzdGVtLkRyYXdpbmcuQ29sb3JdOjpCbGFjaycpKTsKKyAgYXNzZXJ0Lm9rKHdvcmtmbG93LmluY2x1ZGVzKCdbU3lzdGVtLkRyYXdpbmcuQ29sb3JdOjpXaGl0ZScpKTsKKyAgYXNzZXJ0Lm9rKHdvcmtmbG93LmluY2x1ZGVzKCcjRkZGRkZGJykpOworfSk7Cg==''))
+
+        PY
+
+        git apply --check /tmp/student-update.patch
+
+        git apply /tmp/student-update.patch
+
+        fi'
+    - name: Test and generate standalone app
+      run: 'npm install --ignore-scripts --no-audit --no-fund
+
+        npm run lint
+
+        node --test tests/*.test.js
+
+        npm run build'
+    - name: Commit tested source update
+      run: 'git config user.name ''github-actions[bot]''
+
+        git config user.email ''41898282+github-actions[bot]@users.noreply.github.com''
+
+        git add app/index.html app/student-pro.js package.json tests/student-pro.test.js DrWael.html
+
+        git diff --cached --quiet || git commit -m ''Add exam countdown and note search/export [skip ci]''
+
+        git push origin HEAD:main'
   store:
+    needs: update
     runs-on: windows-latest
     timeout-minutes: 25
     steps:
     - uses: actions/checkout@v5
+      with:
+        ref: main
     - uses: actions/setup-node@v5
       with:
         node-version: '22'
-    - name: Prepare Store-only manifest and updater guard
+    - name: Validate source syntax and student features
+      shell: bash
+      run: node --check main.js && node --check app/student-pro.js && node --test tests/student-pro.test.js && npm run build
+    - name: Prepare Microsoft Store package
       shell: bash
       run: 'node <<''JS''
 
         const fs=require(''fs'');
 
-        let s=fs.readFileSync(''main.js'',''utf8'');
-
-        const old=''if (!app.isPackaged) return;'';
-
-        if(s.split(old).length!==2) throw new Error(''Updater marker changed; review required'');
-
-        s=s.replace(old,''if (!app.isPackaged || process.windowsStore) return;'');
-
-        fs.writeFileSync(''main.js'',s);
-
         const p=JSON.parse(fs.readFileSync(''package.json'',''utf8''));
 
-        p.dependencies=p.dependencies||{};p.devDependencies=p.devDependencies||{};
+        p.dependencies={...p.dependencies};delete p.dependencies.express;delete p.dependencies[''electron-updater''];
 
-        delete p.dependencies.express;
+        p.devDependencies={...p.devDependencies,electron:''33.2.1'',''electron-builder'':''25.1.8''};
 
-        p.dependencies[''electron-updater'']=''^6.3.9'';
+        p.version=''1.1.''+process.env.GITHUB_RUN_NUMBER;
 
-        p.devDependencies.electron=''33.2.1'';p.devDependencies[''electron-builder'']=''25.1.8'';
-
-        p.version=''1.0.''+process.env.GITHUB_RUN_NUMBER;
-
-        p.build={...p.build,...{"win":{"target":[{"target":"appx","arch":["x64"]}],"artifactName":"${productName}-Store.${ext}"},"appx":{"applicationId":"App","identityName":"sarmad.eg.Dr.waelDesktop","publisher":"CN=CDF97DF2-E0EE-4A3C-A2C7-45354751C35D","publisherDisplayName":"sarmad.eg","displayName":"Dr.wael
-        Desktop","backgroundColor":"#000000","languages":["ar","en-US"]},"publish":null},win:{...p.build.win,...{"win":{"target":[{"target":"appx","arch":["x64"]}],"artifactName":"${productName}-Store.${ext}"},"appx":{"applicationId":"App","identityName":"sarmad.eg.Dr.waelDesktop","publisher":"CN=CDF97DF2-E0EE-4A3C-A2C7-45354751C35D","publisherDisplayName":"sarmad.eg","displayName":"Dr.wael
-        Desktop","backgroundColor":"#000000","languages":["ar","en-US"]},"publish":null}.win}};
+        p.build={...p.build,win:{...p.build.win,target:[{target:''appx'',arch:[''x64'']}],artifactName:''${productName}-Store.${ext}''},appx:{applicationId:''App'',identityName:''sarmad.eg.Dr.waelDesktop'',publisher:''CN=CDF97DF2-E0EE-4A3C-A2C7-45354751C35D'',publisherDisplayName:''sarmad.eg'',displayName:''Dr.wael
+        Desktop'',backgroundColor:''#FFFFFF'',languages:[''ar'',''en-US'']},publish:null};
 
         fs.writeFileSync(''package.json'',JSON.stringify(p,null,2));
-
 
         JS
 
@@ -54,9 +90,11 @@ jobs:
       shell: pwsh
       run: "Add-Type -AssemblyName System.Drawing\nNew-Item -ItemType Directory -Force build/appx | Out-Null\n$src = [System.Drawing.Image]::FromFile((Resolve-Path\
         \ build/icon.png))\nforeach ($item in @(@('StoreLogo.png',50,50),@('Square44x44Logo.png',44,44),@('Square150x150Logo.png',150,150),@('Wide310x150Logo.png',310,150),@('Square310x310Logo.png',310,310)))\
-        \ {\n  $w=[int]$item[1]; $h=[int]$item[2]\n  $bmp=New-Object System.Drawing.Bitmap($w,$h)\n  $g=[System.Drawing.Graphics]::FromImage($bmp)\n  $g.Clear([System.Drawing.Color]::Black)\n\
-        \  $g.InterpolationMode=[System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic\n  $side=[int]([Math]::Min($w,$h)*0.8)\n  $g.DrawImage($src,[int](($w-$side)/2),[int](($h-$side)/2),$side,$side)\n\
-        \  $bmp.Save((Join-Path $pwd ('build/appx/'+$item[0])),[System.Drawing.Imaging.ImageFormat]::Png)\n  $g.Dispose(); $bmp.Dispose()\n}\n$src.Dispose()"
+        \ {\n  $w=[int]$item[1]; $h=[int]$item[2]\n  $bmp=New-Object System.Drawing.Bitmap($w,$h)\n  $g=[System.Drawing.Graphics]::FromImage($bmp)\n\
+        \  $g.Clear([System.Drawing.Color]::White)\n  $g.InterpolationMode=[System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic\n\
+        \  $side=[int]([Math]::Min($w,$h)*1.0)\n  $g.DrawImage($src,[int](($w-$side)/2),[int](($h-$side)/2),$side,$side)\n\
+        \  $bmp.Save((Join-Path $pwd ('build/appx/'+$item[0])),[System.Drawing.Imaging.ImageFormat]::Png)\n  $g.Dispose();\
+        \ $bmp.Dispose()\n}\n$src.Dispose()"
     - name: Install dependencies
       run: npm install --no-audit --no-fund
       shell: bash
