@@ -34,9 +34,12 @@ jobs:
     - name: Build and smoke-test native Store helper
       shell: pwsh
       run: ./scripts/build-store-helper.ps1
+    - name: Build and validate Windows Hello helper
+      shell: pwsh
+      run: ./scripts/build-windows-hello.ps1
     - name: Real Electron sandbox and native-helper rejection smoke
       shell: bash
-      run: npx electron tests/electron-store-gate-smoke.cjs
+      run: npx electron tests/electron-store-gate-smoke.cjs && npx electron tests/electron-hello-gate-smoke.cjs && ELECTRON_RUN_AS_NODE=1 npx electron --test tests/windows-hello.test.js tests/device-auth.test.js
     - name: Build unsigned package for Store signing only
       shell: bash
       env:

@@ -13,12 +13,13 @@
     "build": "node scripts/build-html.js",
     "start": "node server.js",
     "desktop:zip": "node scripts/build-desktop-zip.js",
-    "lint": "node --check server.js main.js preload.js bridge.js dialog-preload.js scripts/build-html.js scripts/build-desktop-zip.js app/course-alerts.js app/course-features.js app/student-badges.js app/progress-chart.js app/student-pro.js tests/course-alerts.test.js tests/course-features.test.js tests/student-badges.test.js tests/progress-chart.test.js tests/student-pro.test.js tests/standalone-html.test.js && node -e \"const fs=require('fs'),vm=require('vm'),h=fs.readFileSync('app/index.html','utf8');for(const m of h.matchAll(/<script(?![^>]*\\\\bsrc=)[^>]*>([\\\\s\\\\S]*?)<\\\\/script>/gi))new vm.Script(m[1]);console.log('Lint OK')\"",
+    "lint": "node scripts/lint.js",
     "electron:start": "electron .",
     "dist": "electron-builder"
   },
   "dependencies": {
-    "express": "^5.3.0"
+    "express": "^5.3.0",
+    "@simplewebauthn/server": "13.3.2"
   },
   "devDependencies": {},
   "build": {
@@ -47,7 +48,19 @@
       "store-gate.html",
       "store-gate.css",
       "desktop-http.js",
-      "desktop-security.js"
+      "desktop-security.js",
+      "desktop-widget.js",
+      "desktop-widget-preload.js",
+      "desktop-widget-renderer.js",
+      "desktop-widget.html",
+      "desktop-widget.css",
+      "auth-guard.js",
+      "windows-hello.js",
+      "device-auth-challenges.js",
+      "windows-hello-gate.js",
+      "hello-gate-preload.js",
+      "hello-gate-renderer.js",
+      "hello-gate.html"
     ],
     "win": {
       "target": [
@@ -59,7 +72,13 @@
         }
       ],
       "icon": "build/icon.ico",
-      "artifactName": "DrWael-Setup.${ext}"
+      "artifactName": "DrWael-Setup.${ext}",
+      "extraResources": [
+        {
+          "from": "build/native/windows-hello.exe",
+          "to": "native/windows-hello.exe"
+        }
+      ]
     },
     "nsis": {
       "oneClick": false,

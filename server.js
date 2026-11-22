@@ -361,6 +361,8 @@ app.get('/student-pro.js', (_req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   res.sendFile(path.join(__dirname, 'app', 'student-pro.js'));
 });
+app.get(['/pro-promotion.js','/pro-client.js'],(req,res)=>{res.type('application/javascript');res.sendFile(path.join(__dirname,'app',req.path.slice(1)))});
+
 
 app.get('/api/releases', async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');

@@ -402,7 +402,19 @@
     return lines.map(fold).join('\r\n')+'\r\n';
   }
 
+  function organizerSnapshot(tasks, exams, focus, nowMs) {
+    const now = Number.isFinite(nowMs) ? nowMs : Date.now();
+    const cleanTasks = (Array.isArray(tasks) ? tasks : []).filter(x => x && typeof x === 'object' && typeof x.id === 'string' && typeof x.title === 'string' && x.title.trim()).slice(0, 80).map(x => ({id:x.id.slice(0,120),title:x.title.slice(0,120),done:x.done===true,course:typeof x.course==='string'?x.course.slice(0,120):''}));
+    const upcoming = (Array.isArray(exams) ? exams : []).filter(x => x && typeof x.title === 'string' && examDaysLeft(x.date,now)!==null && examDaysLeft(x.date,now)>=0).map(x => ({title:x.title.slice(0,120),date:x.date,days:examDaysLeft(x.date,now)})).sort((a,b)=>a.date.localeCompare(b.date));
+    return {tasks:cleanTasks,open:cleanTasks.filter(x=>!x.done),done:cleanTasks.filter(x=>x.done).length,nextExam:upcoming[0]||null,upcomingCount:upcoming.length,focus:focusSnapshot(focus,now)};
+  }
+  function filterPlannerTasks(tasks, filter, query) {
+    const q=String(query||'').trim().toLocaleLowerCase();
+    return organizerSnapshot(tasks,[],null,0).tasks.filter(x=>(filter==='open'?!x.done:filter==='done'?x.done:true)&&(!q||(x.title+' '+x.course).toLocaleLowerCase().includes(q)));
+  }
+
   return {
+    organizerSnapshot, filterPlannerTasks,
     createFocusSession, focusSnapshot, transitionFocus, examCalendar,
     examDaysLeft,
     searchStudyNotes,

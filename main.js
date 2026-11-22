@@ -1,6 +1,6 @@
 'use strict';
 const {
-  app, BrowserWindow, ipcMain, session, Notification, dialog, Tray, Menu, nativeImage, shell, systemPreferences, clipboard, globalShortcut
+  app, BrowserWindow, ipcMain, session, Notification, dialog, Tray, Menu, nativeImage, shell, systemPreferences, clipboard, globalShortcut, powerMonitor
 } = require('electron');
 const path = require('path');
 const fs = require('fs');
@@ -11,6 +11,12 @@ const createBridge = require('./bridge');
 const { createDesktopHandler } = require('./desktop-http');
 const { trustedIpc, allowPermission } = require('./desktop-security');
 const { enforceStoreStartup } = require('./store-startup');
+const { createDesktopWidget } = require('./desktop-widget');
+const { requestDeviceVerification } = require('./auth-guard');
+const { createWindowsHello } = require('./windows-hello');
+const { createHelloGate, hwnd } = require('./windows-hello-gate');
+let hello=null,helloGate=null,deviceUnlocked=process.platform!=='win32',activeDeviceAccount='windows-device';
+let studyWidget = null;
 
 const CFG = JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json'), 'utf8'));
 const APP_NAME = CFG.appName || 'Dr. Wael';
@@ -142,7 +148,7 @@ window.DWNative={desktop:true,platform:${JSON.stringify(process.platform)},postM
 h.onReply(function(m){try{if(window.DWNative.onmessage)window.DWNative.onmessage({data:m})}catch(e){}});
 if(h.onShield){h.onShield(function(on){try{window.dispatchEvent(new CustomEvent('dw-shield',{detail:!!on}))}catch(e){}});}
 if(h.onUpdate){h.onUpdate(function(info){try{window.dispatchEvent(new CustomEvent('dw-update',{detail:info}))}catch(e){}});}
-var D=function(k,m,d){try{var r=h.dialog(k,m==null?'':String(m),d==null?'':String(d),document.documentElement.lang||'ar',document.documentElement.dir!=='ltr');return r===undefined?null:r}catch(e){return null}};
+var D=function(k,m,d){try{var r=h.dialog(k,m==null?'':String(m),d==null?'':String(d),document.documentElement.lang||'ar',document.documentElement.dir!=='ltr',{dark:document.documentElement.dataset.theme==='dark',colors:['card','ink','mute','line','f2','h1'].map(function(k){return getComputedStyle(document.documentElement).getPropertyValue('--'+k).trim()})});return r===undefined?null:r}catch(e){return null}};
 window.alert=function(m){D('alert',m)};
 window.confirm=function(m){return D('confirm',m)===true};
 window.prompt=function(m,d){var r=D('prompt',m,d);return typeof r==='string'?r:null};
@@ -230,12 +236,12 @@ ipcMain.on('dlg:size', (e, h) => {
   p.w.show();
 });
 
-const trusted = e => trustedIpc(e, win, PORT);
+const trusted = e => deviceUnlocked && trustedIpc(e, win, PORT);
 
 ipcMain.on('dw:dialog', (e, o) => {
   if (!trusted(e) || !o || typeof o !== 'object') { e.returnValue = null; return; }
   const k = ['alert', 'confirm', 'prompt'].includes(o.k) ? o.k : 'alert';
-  brandDialog({ k, m: String(o.m || '').slice(0, 3000), d: String(o.d || '').slice(0, 1000), l: o.l === 'en' ? 'en' : 'ar', rtl: o.rtl !== false })
+  brandDialog({ k, m: String(o.m || '').slice(0, 3000), d: String(o.d || '').slice(0, 1000), l: o.l === 'en' ? 'en' : 'ar', rtl: o.rtl !== false, theme: { dark: o.theme?.dark === true, colors: Array.isArray(o.theme?.colors) ? o.theme.colors.slice(0, 6).map(v => /^#[0-9a-f]{3}([0-9a-f]{3})?$/i.test(String(v)) ? String(v) : '') : [] } })
     .then((v) => { e.returnValue = v === undefined ? null : v; })
     .catch(() => { e.returnValue = null; });
 });
@@ -359,8 +365,9 @@ function applyProtection() {
   for (const bw of BrowserWindow.getAllWindows()) protectWindow(bw);
 }
 
-function showWin() {
+async function showWin() {
   if (!win) return;
+  if(process.platform==='win32'&&!deviceUnlocked){if(!helloGate||!await helloGate.ensure())return;deviceUnlocked=true;}
   if (win.isMinimized()) win.restore();
   applyProtection();
   win.show();
@@ -382,10 +389,10 @@ function createWindow() {
     const icImg = appIcon();
     if (!icImg.isEmpty()) try { win.setIcon(icImg); } catch (e) { /* تجاهل */ }
     applyProtection();
-    win.show();
+    if(deviceUnlocked)win.show();
   });
-  win.on('show', applyProtection);
-  win.on('restore', applyProtection);
+  win.on('show', ()=>{if(!deviceUnlocked){win.hide();return;}applyProtection();});
+  win.on('restore', ()=>{if(!deviceUnlocked){win.hide();return;}applyProtection();});
   win.on('focus', () => {
     applyProtection();
     if (!win.isDestroyed()) win.webContents.send('dw:shield', false);
@@ -397,7 +404,7 @@ function createWindow() {
     unregisterShotShortcuts();
   });
   setTimeout(() => {
-    if (win && !win.isDestroyed() && !win.isVisible()) {
+    if (deviceUnlocked && win && !win.isDestroyed() && !win.isVisible()) {
       applyProtection();
       win.show();
     }
@@ -427,6 +434,8 @@ function createWindow() {
       if (/^(https?:|mailto:|tel:)/i.test(url)) shell.openExternal(url);
     }
   });
+  win.webContents.on('did-start-navigation', (_ev, _url, _inPlace, mainFrame) => { if(mainFrame && studyWidget)studyWidget.clear(); });
+  win.webContents.on('render-process-gone', () => { if(studyWidget)studyWidget.clear(); });
   win.loadURL(origin + '/');
 }
 
@@ -457,7 +466,7 @@ function checkUpdates(manual) {
 
 // ------------------------------------------------------------------ التشغيل
 app.on('second-instance', showWin);
-app.on('before-quit', () => { quitting = true; unregisterShotShortcuts(); });
+app.on('before-quit', () => { quitting = true; if(studyWidget)studyWidget.destroy(); unregisterShotShortcuts(); });
 app.on('will-quit', () => { unregisterShotShortcuts(); });
 app.on('activate', showWin);
 app.on('window-all-closed', () => { /* نبقى في الخلفية (Tray) للتذكيرات */ });
@@ -481,6 +490,13 @@ app.whenReady().then(async () => {
     return;
   }
 
+  if(process.platform==='win32'){
+    hello=createWindowsHello({filePath:path.join(app.getPath('userData'),'hello-public-credential.json'),helperPath:app.isPackaged?path.join(process.resourcesPath,'native','windows-hello.exe'):path.join(__dirname,'build','native','windows-hello.exe')});
+    helloGate=createHelloGate({BrowserWindow,ipcMain,shell,app,hello});
+    const lockDevice=()=>{deviceUnlocked=false;helloGate.close();if(studyWidget)studyWidget.clear();for(const pending of dlgPending.values())pending.fin(false);if(win&&!win.isDestroyed())win.hide();};
+    powerMonitor.on('lock-screen',lockDevice);powerMonitor.on('suspend',lockDevice);
+    try{if(!await helloGate.ensure()){app.quit();return}deviceUnlocked=true}catch(_){app.quit();return}
+  }
   fetchSession = session.fromPartition('libfetch');
   const ses = session.defaultSession;
   ses.setPermissionRequestHandler((wc, perm, cb, details) => cb(allowPermission(wc, perm, details, win, PORT)));
@@ -496,7 +512,7 @@ app.whenReady().then(async () => {
     version: app.getVersion(),
     now: () => Date.now(),
     notify: (t, b) => {
-      if (!Notification.isSupported()) return;
+      if (!deviceUnlocked || !Notification.isSupported()) return;
       const n = new Notification({ title: t || APP_NAME, body: b || '', icon: appIcon() });
       n.on('click', showWin);
       n.show();
@@ -508,12 +524,10 @@ app.whenReady().then(async () => {
       return true;
     },
     openExternal: (url) => shell.openExternal(url),
-    touchId: async (why) => {
-      if (process.platform === 'darwin' && systemPreferences.canPromptTouchID()) {
-        try { await systemPreferences.promptTouchID(why); return true; } catch (e) { return false; }
-      }
-      return true; // على ويندوز/لينكس تحمي الصفحة نفسها برمز PIN
-    },
+    helloSettings:()=>shell.openExternal('ms-settings:signinoptions').catch(()=>{}),
+    touchId: (why,context) => requestDeviceVerification({platform:process.platform,windowsHello:async()=>{if(!deviceUnlocked||!hello||!win||win.isDestroyed()||why!=='pay')return false;return hello.verify({hwnd:hwnd(win),accountId:activeDeviceAccount,purpose:'payment',context:{why,transaction:context??null}})},canTouchID:()=>systemPreferences.canPromptTouchID(),touchID:reason=>systemPreferences.promptTouchID(reason),reason:why}),
+    session:uid=>{const next=String(uid||'windows-device').slice(0,256);if(next!==activeDeviceAccount){activeDeviceAccount=next;if(hello)hello.clear();}},
+    logout:()=>{activeDeviceAccount='windows-device';if(hello)hello.clear();},
     setIcon: (name) => {
       const img = nativeImage.createFromPath(iconPath(name));
       if (img.isEmpty()) return false;
@@ -546,6 +560,7 @@ app.whenReady().then(async () => {
     if (!dockImg.isEmpty()) app.dock.setIcon(dockImg);
   }
   createWindow();
+  studyWidget=createDesktopWidget({BrowserWindow,ipcMain,powerMonitor,trustedMain:trusted,showMain:()=>{showWin();if(win&&!win.isDestroyed())win.webContents.send('dw:widget:edit');}});
   createTray();
   setInterval(() => bridge.tick(), 20000);
   setTimeout(() => { prefetchLibs(); checkUpdates(false); }, 4000);

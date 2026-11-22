@@ -45,6 +45,7 @@ test('local server rejects foreign Host and serves the actual Student Hub module
   assert.equal(result.status,200);assert.match(result.body,/computePlannerSummary/);
   assert.equal(result.headers['x-frame-options'],'DENY');
   assert.equal(result.headers['content-security-policy'],"frame-ancestors 'none'");
+  for(const moduleName of ['pro-promotion.js','pro-client.js']){const module=await request('localhost:'+port,'/'+moduleName);assert.equal(module.status,200);assert.match(module.headers['content-type'],/javascript/);}
   assert.equal((await request('localhost:'+port,'/../../package.json')).status,404);
 });
 test('bridge rejects null, scalar and array input without invoking native services',async()=>{
