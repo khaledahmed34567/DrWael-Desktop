@@ -12,35 +12,17 @@ jobs:
     - uses: actions/setup-node@v5
       with:
         node-version: '22'
-    - name: Validate source syntax and student features
+    - name: Validate source and Store gate
       shell: bash
-      run: node --check main.js && node --check app/student-pro.js && node --test tests/student-pro.test.js && npm run build
+      run: npm install --no-audit --no-fund && node --check main.js && node --check store-startup.js && node --check
+        store-update.js && node --test tests/*.test.js && npm run build
     - name: Prepare Microsoft Store package
       shell: bash
-      run: 'node <<''JS''
-
-        const fs=require(''fs'');
-
-        const p=JSON.parse(fs.readFileSync(''package.json'',''utf8''));
-
-        p.dependencies={...p.dependencies};delete p.dependencies.express;delete p.dependencies[''electron-updater''];
-
-        p.devDependencies={...p.devDependencies,electron:''33.2.1'',''electron-builder'':''25.1.8''};
-
-        p.version=''1.1.''+process.env.GITHUB_RUN_NUMBER;
-
-        p.build={...p.build,win:{...p.build.win,target:[{target:''appx'',arch:[''x64'']}],artifactName:''${productName}-Store.${ext}''},appx:{applicationId:''App'',identityName:''sarmad.eg.Dr.waelDesktop'',publisher:''CN=CDF97DF2-E0EE-4A3C-A2C7-45354751C35D'',publisherDisplayName:''sarmad.eg'',displayName:''Dr.wael
-        Desktop'',backgroundColor:''#FFFFFF'',languages:[''ar'',''en-US'']},publish:null};
-
-        fs.writeFileSync(''package.json'',JSON.stringify(p,null,2));
-
-        JS
-
-        '
+      run: node scripts/prepare-store.js
     - name: Generate branded Store tiles
       shell: pwsh
-      run: "Add-Type -AssemblyName System.Drawing\nNew-Item -ItemType Directory -Force build/appx | Out-Null\n$src = [System.Drawing.Image]::FromFile((Resolve-Path\
-        \ build/icon.png))\nforeach ($item in @(@('StoreLogo.png',50,50),@('Square44x44Logo.png',44,44),@('Square150x150Logo.png',150,150),@('Wide310x150Logo.png',310,150),@('Square310x310Logo.png',310,310)))\
+      run: "Add-Type -AssemblyName System.Drawing\nNew-Item -ItemType Directory -Force build/appx | Out-Null\n$src\
+        \ = [System.Drawing.Image]::FromFile((Resolve-Path build/icon.png))\nforeach ($item in @(@('StoreLogo.png',50,50),@('Square44x44Logo.png',44,44),@('Square150x150Logo.png',150,150),@('Wide310x150Logo.png',310,150),@('Square310x310Logo.png',310,310)))\
         \ {\n  $w=[int]$item[1]; $h=[int]$item[2]\n  $bmp=New-Object System.Drawing.Bitmap($w,$h)\n  $g=[System.Drawing.Graphics]::FromImage($bmp)\n\
         \  $g.Clear([System.Drawing.Color]::White)\n  $g.InterpolationMode=[System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic\n\
         \  $side=[int]([Math]::Min($w,$h)*1.0)\n  $g.DrawImage($src,[int](($w-$side)/2),[int](($h-$side)/2),$side,$side)\n\
@@ -49,6 +31,12 @@ jobs:
     - name: Install dependencies
       run: npm install --no-audit --no-fund
       shell: bash
+    - name: Build and smoke-test native Store helper
+      shell: pwsh
+      run: ./scripts/build-store-helper.ps1
+    - name: Real Electron sandbox and native-helper rejection smoke
+      shell: bash
+      run: npx electron tests/electron-store-gate-smoke.cjs
     - name: Build unsigned package for Store signing only
       shell: bash
       env:
