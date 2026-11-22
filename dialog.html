@@ -5,17 +5,19 @@
 <style>
 @font-face{font-family:AJ;font-weight:400;src:url(assets/fonts/aj_400.ttf)}
 @font-face{font-family:AJ;font-weight:700;src:url(assets/fonts/aj_700.ttf)}
+:root{--card:#fff;--ink:#101426;--mute:#4a4f68;--line:#e4e5ee;--f2:#f1f1f4;--h1:#B22127;color-scheme:light}
+:root[data-dark=true]{--card:#1c2130;--ink:#f1f3fa;--mute:#b8bfd3;--line:#353e54;--f2:#252d40;--h1:#c7343b;color-scheme:dark}
 html,body{margin:0;background:transparent;overflow:hidden;user-select:none;-webkit-user-select:none}
 body{font-family:AJ,system-ui,sans-serif;padding:14px}
-.card{background:#fff;border-radius:26px;padding:20px 22px 16px;box-shadow:0 16px 50px rgba(0,0,0,.35)}
-.bar{width:42px;height:5px;border-radius:3px;background:#B22127;margin-bottom:14px}
-h1{margin:0;font-size:19px;color:#101426}
-p{margin:10px 0 0;font-size:14.5px;line-height:1.7;color:#4a4f68;white-space:pre-wrap;max-height:300px;overflow:auto;word-break:break-word}
-input{display:block;box-sizing:border-box;width:100%;margin-top:12px;padding:11px 12px;border:0;border-radius:14px;background:#f1f1f4;font:inherit;font-size:15px;color:#101426;outline:2px solid transparent}
-input:focus{outline-color:#B22127}
+.card{background:var(--card);border-radius:26px;padding:20px 22px 16px;box-shadow:0 16px 50px rgba(0,0,0,.35)}
+.bar{width:42px;height:5px;border-radius:3px;background:var(--h1);margin-bottom:14px}
+h1{margin:0;font-size:19px;color:var(--ink)}
+p{margin:10px 0 0;font-size:14.5px;line-height:1.7;color:var(--mute);white-space:pre-wrap;max-height:300px;overflow:auto;word-break:break-word}
+input{display:block;box-sizing:border-box;width:100%;margin-top:12px;padding:11px 12px;border:0;border-radius:14px;background:var(--f2);font:inherit;font-size:15px;color:var(--ink);outline:2px solid transparent}
+input:focus{outline-color:var(--h1)}
 .row{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
 button{font:inherit;font-weight:700;font-size:15px;border:0;border-radius:14px;padding:10px 22px;min-width:96px;cursor:pointer}
-#ok{background:#B22127;color:#fff}#no{background:#f1f1f4;color:#4a4f68}
+#ok{background:var(--h1);color:#fff}#no{background:var(--f2);color:var(--mute)}
 @media print{html,body{display:none!important;visibility:hidden!important}}
 </style>
 </head>
@@ -31,6 +33,8 @@ const finish = (ok) => {
 };
 window.__dlg.onInit((o) => {
   kind = o.k;
+  document.documentElement.dataset.dark=String(o.theme?.dark===true);
+  ['card','ink','mute','line','f2','h1'].forEach((key,i)=>{const value=o.theme?.colors?.[i];if(/^#[0-9a-f]{3}([0-9a-f]{3})?$/i.test(String(value)))document.documentElement.style.setProperty('--'+key,value)});
   const ar = (o.l || 'ar') !== 'en';
   document.documentElement.dir = o.rtl === false ? 'ltr' : (ar ? 'rtl' : 'ltr');
   $('t').textContent = o.title || (ar ? 'د. وائل' : 'Dr. Wael');

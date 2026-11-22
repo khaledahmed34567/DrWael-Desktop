@@ -4,6 +4,11 @@ on:
   push:
     branches: [ main, master ]
   workflow_dispatch:
+    inputs:
+      publish_release:
+        description: Publish only after source validation
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -76,6 +81,7 @@ jobs:
             const p = JSON.parse(fs.readFileSync("package.json", "utf8"));
             p.dependencies = p.dependencies || {};
             p.devDependencies = p.devDependencies || {};
+            p.devDependencies.express = p.dependencies.express || "^5.3.0";
             delete p.dependencies.express;
             delete p.dependencies["electron-updater"];
             if (!p.devDependencies.electron) p.devDependencies.electron = "^33.2.1";
@@ -86,6 +92,26 @@ jobs:
             fs.writeFileSync("package.json", JSON.stringify(p, null, 2) + "\n");
           '
           npm install --no-audit --no-fund
+
+      - name: Validate app source and behavior
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: npm run lint && node --test tests/*.test.js && npm run build
+
+      - name: Compile and validate Windows Hello helper
+        if: runner.os == 'Windows'
+        working-directory: ${{ env.PROJECT_DIR }}
+        shell: pwsh
+        run: ./scripts/build-windows-hello.ps1
+
+      - name: Validate real sandboxed native-gate IPC
+        if: runner.os == 'Windows'
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: npx electron tests/electron-hello-gate-smoke.cjs
+
+      - name: Validate verifier in the Electron Node runtime
+        if: runner.os == 'Windows'
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: ELECTRON_RUN_AS_NODE=1 npx electron --test tests/windows-hello.test.js tests/device-auth.test.js
 
       - name: Build installers
         working-directory: ${{ env.PROJECT_DIR }}
@@ -110,6 +136,7 @@ jobs:
           if-no-files-found: error
 
   release:
+    if: github.event_name == 'push' || inputs.publish_release == true
     needs: build
     runs-on: ubuntu-latest
     steps:

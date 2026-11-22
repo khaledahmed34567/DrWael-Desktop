@@ -8,6 +8,7 @@ const ROOT = path.resolve(__dirname, '..');
 
 const DESKTOP_ENTRIES = [
   'package.json',
+  'package-lock.json',
   'main.js',
   'store-update.js',
   'store-startup.js',
@@ -20,7 +21,8 @@ const DESKTOP_ENTRIES = [
   'preload.js',
   'bridge.js',
   'desktop-http.js',
-  'desktop-security.js',
+  'windows-hello.js','windows-hello-gate.js','device-auth-challenges.js','hello-gate.html','hello-gate-preload.js','hello-gate-renderer.js',
+  'auth-guard.js', 'desktop-widget.js', 'desktop-widget-preload.js', 'desktop-widget-renderer.js', 'desktop-widget.html', 'desktop-widget.css', 'desktop-security.js',
   'dialog.html',
   'dialog-preload.js',
   'config.json',
@@ -67,7 +69,7 @@ function collectFiles(rootDir) {
     if (st.isDirectory()) {
       const children = fs.readdirSync(abs).sort();
       for (const ch of children) {
-        if (ch === 'node_modules' || ch === '.git' || ch === 'dist' || ch === 'out' || ch === '_project') continue;
+        if (ch === 'validation' || ch.endsWith('.obj') || ch.endsWith('.tmp') || ch === 'node_modules' || ch === '.git' || ch === 'dist' || ch === 'out' || ch === '_project') continue;
         walk(`${cleanRel}/${ch}`);
       }
       return;

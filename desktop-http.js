@@ -19,7 +19,7 @@ function createDesktopHandler({ rootDir, getPort, pageHtml, libAllowed, isCached
           res.writeHead(200, { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' });
           return res.end(pageHtml());
         }
-        const scripts = ['course-alerts.js', 'course-features.js', 'student-badges.js', 'progress-chart.js', 'student-pro.js'];
+        const scripts = ['course-alerts.js', 'course-features.js', 'student-badges.js', 'progress-chart.js', 'student-pro.js','pro-promotion.js','pro-client.js'];
         if (req.method === 'GET' && scripts.some(name => u.pathname === '/' + name)) {
           res.writeHead(200, { 'content-type': 'application/javascript; charset=utf-8', 'cache-control': 'no-store' });
           return res.end(fs.readFileSync(path.join(rootDir, 'app', u.pathname.slice(1)), 'utf8'));
