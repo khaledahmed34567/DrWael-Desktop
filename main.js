@@ -17,7 +17,6 @@ let tray = null;
 let quitting = false;
 let PORT = 0;
 let bridge = null;
-let autoUpdater = null;
 
 if (!app.requestSingleInstanceLock()) {
   app.quit();
@@ -512,7 +511,7 @@ function createTray() {
     tray.setToolTip(APP_NAME);
     tray.setContextMenu(Menu.buildFromTemplate([
       { label: 'فتح / Open', click: showWin },
-      { label: 'التحقق من التحديثات / Check for updates', click: () => checkUpdates(true) },
+      { label: 'Microsoft Store / تحديث التطبيق', click: () => checkUpdates(true) },
       { type: 'separator' },
       { label: 'خروج / Quit', click: () => { quitting = true; app.quit(); } }
     ]));
@@ -522,34 +521,12 @@ function createTray() {
 
 // ------------------------------------------------------------------ التحديثات (ويندوز ولينكس AppImage)
 function checkUpdates(manual) {
-  if (!app.isPackaged) return;
-  if (process.platform === 'darwin') {
-    if (manual) shell.openExternal('https://github.com/khaledahmed34567/DrWael-Desktop/releases/latest');
-    return;
-  }
-  try {
-    if (!autoUpdater) {
-      ({ autoUpdater } = require('electron-updater'));
-      autoUpdater.autoDownload = true;
-      autoUpdater.on('update-available', (info) => {
-        if (win && !win.isDestroyed()) {
-          try { win.webContents.send('dw:update', { status: 'available', version: info && info.version ? String(info.version) : '' }); } catch (e) { /* تجاهل */ }
-        }
-      });
-      autoUpdater.on('update-downloaded', (info) => {
-        if (win && !win.isDestroyed()) {
-          try { win.webContents.send('dw:update', { status: 'downloaded', version: info && info.version ? String(info.version) : '' }); } catch (e) { /* تجاهل */ }
-        }
-        brandDialog({
-          k: 'confirm', l: 'ar', rtl: true,
-          m: 'تحديث جديد (الإصدار ' + info.version + ') جاهز. هل تريد إعادة التشغيل الآن لتثبيته؟',
-          okText: 'إعادة التشغيل', cancelText: 'لاحقًا'
-        }).then((yes) => { if (yes) { quitting = true; autoUpdater.quitAndInstall(); } });
-      });
-      autoUpdater.on('error', () => { /* تجاهل أخطاء الشبكة */ });
-    }
-    autoUpdater.checkForUpdates().catch(() => {});
-  } catch (e) { /* تجاهل */ }
+  // Microsoft Store owns installation, signatures and all app updates.
+  // Never download or execute an installer from a repository.
+  if (!manual) return;
+  shell.openExternal('ms-windows-store://pdp/?ProductId=9NCK2L097D7M').catch(() => {
+    shell.openExternal('https://apps.microsoft.com/detail/9NCK2L097D7M').catch(() => {});
+  });
 }
 
 // ------------------------------------------------------------------ التشغيل
