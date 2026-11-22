@@ -333,7 +333,30 @@
     };
   }
 
+  // Date-only deadlines use calendar days, not elapsed hours (DST-safe).
+  function examDaysLeft(dateText, nowMs) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(dateText))) return null;
+    const [y,m,d] = dateText.split('-').map(Number);
+    const exam = new Date(y,m-1,d);
+    if(exam.getFullYear()!==y || exam.getMonth()!==m-1 || exam.getDate()!==d) return null;
+    const now = new Date(nowMs === undefined ? Date.now() : nowMs);
+    return Math.round((Date.UTC(y,m-1,d)-Date.UTC(now.getFullYear(),now.getMonth(),now.getDate()))/86400000);
+  }
+
+  function searchStudyNotes(notes, query) {
+    const normalize = value => String(value || '').normalize('NFKC').toLocaleLowerCase().replace(/[\u064B-\u065F\u0670\u0640]/g,'').trim();
+    const q = normalize(query);
+    return (Array.isArray(notes) ? notes : []).filter(n => n && (!q || normalize(n.title+' '+n.body).includes(q)));
+  }
+
+  function exportStudyNotes(notes) {
+    return (Array.isArray(notes) ? notes : []).filter(Boolean).map(n => String(n.title||'')+'\n'+String(n.body||'')).join('\n\n--------------------\n\n');
+  }
+
   return {
+    examDaysLeft,
+    searchStudyNotes,
+    exportStudyNotes,
     ONE_YEAR_MS,
     PRO_FREE_LAUNCH_MS,
     evaluateProAccess,

@@ -96,14 +96,6 @@
       "category": "Education",
       "maintainer": "Dr. Wael <info@drwael.app>",
       "artifactName": "DrWael-linux.${ext}"
-    },
-    "publish": [
-      {
-        "provider": "github",
-        "owner": "khaledahmed34567",
-        "repo": "DrWael-Desktop",
-        "releaseType": "release"
-      }
-    ]
+    }
   }
 }

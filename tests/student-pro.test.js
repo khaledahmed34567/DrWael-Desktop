@@ -102,3 +102,36 @@ test('flashcards, GPA calculator, IV fluid rate calculator, and study planner wo
   assert.equal(plan.dailyPercent, 75);
   assert.equal(plan.goalMet, false);
 });
+
+const {examDaysLeft, searchStudyNotes, exportStudyNotes} = require('../app/student-pro');
+test('exam countdown validates calendar dates and uses whole local calendar days', () => {
+  const now=new Date(2026,10,22,23,59).getTime();
+  assert.equal(examDaysLeft('2026-11-23',now),1);
+  assert.equal(examDaysLeft('2026-11-22',now),0);
+  assert.equal(examDaysLeft('2026-11-20',now),-2);
+  assert.equal(examDaysLeft('2026-02-30',now),null);
+  assert.equal(examDaysLeft('2026-13-01',now),null);
+  assert.equal(examDaysLeft('bad',now),null);
+  assert.equal(examDaysLeft('2028-02-29',new Date(2028,1,28).getTime()),1);
+});
+test('notes search supports Arabic diacritics, English case and empty searches without mutation', () => {
+  const notes=[{title:'مُراجعة',body:'تشريح'},{title:'Anatomy',body:'Revision notes'}];
+  assert.equal(searchStudyNotes(notes,'مراجعة').length,1);
+  assert.equal(searchStudyNotes(notes,'REVISION').length,1);
+  assert.equal(searchStudyNotes(notes,'absent').length,0);
+  assert.equal(searchStudyNotes(notes,'').length,2);
+  assert.equal(notes.length,2);
+  assert.equal(exportStudyNotes(notes),'مُراجعة\nتشريح\n\n--------------------\n\nAnatomy\nRevision notes');
+  assert.equal(exportStudyNotes([]),'');
+});
+test('desktop updates no longer fetch repository installers and Store tiles avoid black edges', () => {
+  const fs=require('node:fs'),path=require('node:path');
+  const main=fs.readFileSync(path.join(__dirname,'../main.js'),'utf8');
+  assert.ok(!main.includes('electron-updater'));
+  assert.ok(!main.includes('releases/latest'));
+  assert.ok(main.includes('ms-windows-store://pdp/?ProductId=9NCK2L097D7M'));
+  const workflow=fs.readFileSync(path.join(__dirname,'../.github/workflows/store-build.yml'),'utf8');
+  assert.ok(!workflow.includes('[System.Drawing.Color]::Black'));
+  assert.ok(workflow.includes('[System.Drawing.Color]::White'));
+  assert.ok(workflow.includes('#FFFFFF'));
+});

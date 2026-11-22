@@ -2269,7 +2269,30 @@ body.dw-blur>:not(#dw-shield){filter:blur(24px)}
     };
   }
 
+  // Date-only deadlines use calendar days, not elapsed hours (DST-safe).
+  function examDaysLeft(dateText, nowMs) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(dateText))) return null;
+    const [y,m,d] = dateText.split('-').map(Number);
+    const exam = new Date(y,m-1,d);
+    if(exam.getFullYear()!==y || exam.getMonth()!==m-1 || exam.getDate()!==d) return null;
+    const now = new Date(nowMs === undefined ? Date.now() : nowMs);
+    return Math.round((Date.UTC(y,m-1,d)-Date.UTC(now.getFullYear(),now.getMonth(),now.getDate()))/86400000);
+  }
+
+  function searchStudyNotes(notes, query) {
+    const normalize = value => String(value || '').normalize('NFKC').toLocaleLowerCase().replace(/[\u064B-\u065F\u0670\u0640]/g,'').trim();
+    const q = normalize(query);
+    return (Array.isArray(notes) ? notes : []).filter(n => n && (!q || normalize(n.title+' '+n.body).includes(q)));
+  }
+
+  function exportStudyNotes(notes) {
+    return (Array.isArray(notes) ? notes : []).filter(Boolean).map(n => String(n.title||'')+'\n'+String(n.body||'')).join('\n\n--------------------\n\n');
+  }
+
   return {
+    examDaysLeft,
+    searchStudyNotes,
+    exportStudyNotes,
     ONE_YEAR_MS,
     PRO_FREE_LAUNCH_MS,
     evaluateProAccess,
@@ -4065,6 +4088,11 @@ function mountUpdateBanner(){
   }
 }
 async function checkAppUpdates(opts){
+  if(DESK){
+    _appUpdateState=null;mountUpdateBanner();
+    if(opts&&opts.manual){nreq("update");toast(L("التحديثات متاحة من Microsoft Store","Updates are managed by Microsoft Store"))}
+    return null;
+  }
   const pc=window.DWProgressChart;
   if(!pc)return null;
   const force=!!(opts&&opts.force),manual=!!(opts&&opts.manual);
@@ -4107,6 +4135,7 @@ async function checkAppUpdates(opts){
   return res;
 }
 window.addEventListener("dw-update",ev=>{
+  if(DESK)return;
   const d=ev&&ev.detail||{};
   const v=String(d.version||"");
   const isReady=d.status==="downloaded";
@@ -4131,6 +4160,7 @@ g.querySelectorAll(".del").forEach(b=>b.onclick=async()=>{if(!confirm(L("حذف 
 const ad=$("#dlad");if(ad&&adm){ad.innerHTML=`<label class="btn ghost" style="margin-top:10px;display:block;text-align:center">${L("رفع صور من التطبيق","Upload app screenshots")}<input type="file" id="dlf" accept="image/*" multiple hidden></label><p class="small" id="dlm"></p>`;
 $("#dlf").onchange=async e=>{const fs=[...e.target.files].slice(0,12),m=$("#dlm");if(!fs.length)return;const urls=[];try{for(let i=0;i<fs.length;i++){m.textContent=L("جاري الرفع ","Uploading ")+(i+1)+" / "+fs.length;urls.push(await imgbb(fs[i]))}await db.doc("settings/appdl").set({shots:firebase.firestore.FieldValue.arrayUnion(...urls)},{merge:true});dlGallery()}catch(x){m.textContent=L("تعذر الرفع. تأكد من قواعد الحماية لـ settings/appdl.","Upload failed. Check the security rule for settings/appdl.")}}}}
 function showDl(){
+  if(DESK){nreq("update");return}
   const old=$("#dlp");if(old)old.remove();
   const pc=window.DWProgressChart;
   const plat=pc?pc.detectClientPlatform(navigator.userAgent,window.DWNative&&DWNative.platform):"android";
@@ -4746,7 +4776,8 @@ function vStudentHub(tab){
       ["cards",L("البطاقات","Flashcards")],
       ["planner",L("خطتي","Planner")],
       ["calc",L("GPA ومحاليل","GPA & Fluids")],
-      ["notes",L("مفكرتي","Notes")]
+      ["notes",L("مفكرتي","Notes")],
+      ["exams",L("امتحاناتي","Exams")]
     ];
     return`<div class="seg" style="margin-bottom:12px">${tabs.map(x=>`<button data-ht="${x[0]}" class="${_hubTab===x[0]?"on":""}">${esc(x[1])}</button>`).join("")}</div><div id="hubBody"></div>`;
   };
@@ -4914,7 +4945,17 @@ function vStudentHub(tab){
       return;
     }
 
+    if(_hubTab==="exams"){
+      const examKey="dw_exams_"+uid;
+      const exams=getArr(examKey).filter(e=>e&&sp.examDaysLeft(e.date)!==null).sort((a,b)=>a.date.localeCompare(b.date));
+      hb.innerHTML=`<div class="card"><div class="lab">${L("مواعيد الامتحانات والعد التنازلي","Exam dates & countdown")}</div><p class="small">${L("محفوظة على هذا الجهاز فقط. لا ترسل تنبيهات في الخلفية.","Saved on this device only. No background reminders.")}</p><label class="small" for="examTitle">${L("المادة","Subject")}</label><input class="fi" id="examTitle" maxlength="120"><label class="small" for="examDate">${L("تاريخ الامتحان","Exam date")}</label><input class="fi" type="date" id="examDate"><button class="btn gold" id="examAdd">${L("إضافة امتحان","Add exam")}</button></div><div>${exams.length?exams.map(e=>{const days=sp.examDaysLeft(e.date);return `<div class="item"><div class="nm">${esc(e.title)}</div><div class="small" dir="ltr">${esc(e.date)}</div><div class="stat ${days<0?"":"ok"}">${days===0?L("الامتحان اليوم","Exam today"):days>0?L("باقي "+days+" يوم","In "+days+" days"):L("انتهى منذ "+Math.abs(days)+" يوم",Math.abs(days)+" days ago")}</div><button class="rm" data-exam-delete="${esc(e.id)}">${L("حذف","Delete")}</button></div>`}).join(""):`<div class="empty">${L("أضف موعد امتحانك القادم لتنظيم المراجعة.","Add your next exam to plan your revision.")}</div>`}</div>`;
+      $("#examAdd").onclick=()=>{const title=$("#examTitle").value.trim(),date=$("#examDate").value;if(!title||sp.examDaysLeft(date)===null){toast(L("اكتب المادة واختر تاريخًا صحيحًا","Enter a subject and a valid date"));return}const list=getArr(examKey);list.push({id:"exam_"+Date.now(),title:title.slice(0,120),date});ls.set(examKey,JSON.stringify(list.slice(-100)));drawTab()};
+      $$("[data-exam-delete]").forEach(b=>b.onclick=()=>{if(!confirm(L("حذف موعد الامتحان؟","Delete this exam?")))return;ls.set(examKey,JSON.stringify(getArr(examKey).filter(e=>e.id!==b.dataset.examDelete)));drawTab()});
+      return;
+    }
+
     const notes=getArr(notesKey);
+    let noteQuery="";
     hb.innerHTML=`
       <div class="card">
         <div class="lab">${L("أضف ملاحظة دراسية جديدة","Add a study note")}</div>
@@ -4922,11 +4963,20 @@ function vStudentHub(tab){
         <textarea class="fi" id="ntB" rows="3" placeholder="${L("اكتب تلخيصًا، جرعة مهمة، أو نقطة امتحان...","Write a summary, key dosage, or exam point...")}"></textarea>
         <button class="btn gold" id="ntAdd">${L("حفظ الملاحظة","Save note")}</button>
       </div>
-      ${notes.length?notes.map(n=>`<div class="item"><div class="nm">${esc(n.title)}</div><div class="tx">${esc(n.body)}</div><div class="small">${fd(n.at)}</div><div class="acts"><button class="pl" data-ntc="${esc(n.id)}">${t("copy")}</button><button class="rm" data-ntd="${esc(n.id)}">${L("حذف","Delete")}</button></div></div>`).join(""):`<div class="empty">${L("مفكرتك فارغة حاليًا — احفظ ملاحظاتك السريعة هنا.","Your notebook is empty — save quick study notes here.")}</div>`}
+      <div class="card"><label class="lab" for="notesSearch">${L("بحث في ملاحظاتك","Search your notes")}</label><input class="fi" type="search" id="notesSearch" placeholder="${L("عنوان أو كلمة من المحتوى","Title or a word from the note")}"><button class="btn ghost" id="notesExport" ${notes.length?"":"disabled"}>${L("تصدير الملاحظات كملف نصي","Export notes as text")}</button><p class="small">${L("الملف يحتوي على ملاحظاتك الشخصية. احفظه في مكان آمن.","This file contains your personal notes. Keep it somewhere safe.")}</p></div>
+      <div id="notesResults"></div>
     `;
+    const renderNotes=()=>{
+      const filtered=sp.searchStudyNotes(notes,noteQuery);
+      $("#notesResults").innerHTML=filtered.length?filtered.map(n=>`<div class="item"><div class="nm">${esc(n.title)}</div><div class="tx" style="white-space:pre-wrap">${esc(n.body)}</div><div class="small">${fd(n.at)}</div><div class="acts"><button class="pl" data-ntc="${esc(n.id)}">${t("copy")}</button><button class="rm" data-ntd="${esc(n.id)}">${L("حذف","Delete")}</button></div></div>`).join(""):`<div class="empty">${L("لا توجد ملاحظات مطابقة.","No matching notes.")}</div>`;
+      $$("[data-ntc]").forEach(b=>b.onclick=()=>{const it=notes.find(x=>x.id===b.dataset.ntc);if(it)try{navigator.clipboard.writeText(it.title+"\n"+it.body);toast(t("copied"))}catch(e){}});
+      $$("[data-ntd]").forEach(b=>b.onclick=()=>{if(!confirm(L("حذف هذه الملاحظة؟","Delete this note?")))return;ls.set(notesKey,JSON.stringify(getArr(notesKey).filter(x=>x.id!==b.dataset.ntd)));drawTab()});
+    };
+    $("#notesSearch").oninput=e=>{noteQuery=e.target.value;renderNotes()};
+    $("#notesExport").onclick=()=>dl(new Blob(["\ufeff"+sp.exportStudyNotes(notes)],{type:"text/plain;charset=utf-8"}),"DrWael-study-notes.txt");
+    renderNotes();
     $("#ntAdd").onclick=()=>{const ti=$("#ntT").value.trim(),bd=$("#ntB").value.trim();if(!ti||!bd){toast(L("اكتب العنوان والمحتوى","Enter title and note"));return}const list=getArr(notesKey);list.unshift({id:"nt_"+Date.now(),title:ti.slice(0,100),body:bd.slice(0,2000),at:Date.now()});ls.set(notesKey,JSON.stringify(list.slice(0,120)));toast(L("تم حفظ الملاحظة","Note saved"));drawTab()};
-    $$("[data-ntc]").forEach(b=>b.onclick=()=>{const it=getArr(notesKey).find(x=>x.id===b.dataset.ntc);if(it)try{navigator.clipboard.writeText(it.title+"\n"+it.body);toast(t("copied"))}catch(e){}});
-    $$("[data-ntd]").forEach(b=>b.onclick=()=>{ls.set(notesKey,JSON.stringify(getArr(notesKey).filter(x=>x.id!==b.dataset.ntd)));drawTab()});
+
   }
   drawTab();
 }
