@@ -41,7 +41,7 @@ test('manual desktop update status opens the Store without falsely reporting lat
  const end=html.indexOf('$("#dlb2").onclick=showDl;',begin);
  assert.ok(begin>0&&end>begin);
  const button={disabled:false},status={innerHTML:''};let requested=false;
- const context={$:s=>s==='#updb'?button:status,DESK:true,L:(_ar,en)=>en,esc:s=>s,checkAppUpdates:async opts=>{requested=opts.manual&&opts.force;return null}};
+ const context={$:s=>s==='#updb'?button:status,DESK:true,L:(_ar,en)=>en,esc:s=>s,dwBackup(){},dwDoRestore(){},dwPickRestore(){},_dwPend:false,checkAppUpdates:async opts=>{requested=opts.manual&&opts.force;return null}};
  vm.runInNewContext(html.slice(begin,end),context);
  await button.onclick();
  assert.equal(requested,true);assert.equal(button.disabled,false);
